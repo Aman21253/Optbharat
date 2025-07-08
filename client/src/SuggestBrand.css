@@ -1,0 +1,35 @@
+.suggest-form {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+  }
+  
+  .suggest-form h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .suggest-form input,
+  .suggest-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .suggest-form button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .suggest-form button:hover {
+    background-color: #0056b3;
+  }

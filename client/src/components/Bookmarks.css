@@ -1,0 +1,61 @@
+.bookmark-container {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.bookmark-heading {
+  text-align: center;
+  font-size: 2.2rem;
+  color: #1a1a1a;
+  margin-bottom: 30px;
+}
+
+.bookmark-message {
+  text-align: center;
+  font-size: 1.15rem;
+  color: #555;
+  margin-top: 30px;
+}
+
+.brand-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.brand-card {
+  background-color: #ffffff;
+  border: 1px solid #e1e1e1;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.brand-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.brand-link {
+  text-decoration: none;
+  color: #007bff;
+}
+
+.brand-link h3 {
+  margin: 0 0 10px;
+  font-size: 1.25rem;
+}
+
+.brand-card p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.highlight {
+  border: 2px solid #2ecc71;
+  background-color: #f0fbf4;
+}

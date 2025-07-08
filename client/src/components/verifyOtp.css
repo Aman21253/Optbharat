@@ -1,0 +1,12 @@
+.otp-container input, .otp-container button {
+    padding: 10px;
+    font-size: 1rem;
+  }
+  
+  .otp-container button {
+    background: #1976d2;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+  }
