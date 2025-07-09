@@ -1,12 +1,83 @@
-# React + Vite
+# MakeInBharat Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React application for discovering, supporting, and listing Indian brands. This project is part of the MakeInBharat initiative, aiming to promote Indian manufacturing and local businesses.
 
-Currently, two official plugins are available:
+## Project Overview
+MakeInBharat is a platform where users can:
+- Discover Indian brands across various categories
+- Suggest new brands
+- Add new brand listings (with authentication)
+- Bookmark favorite brands
+- Review and rate brands
+- Access admin features (for authorized users)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
+- Responsive, modern UI built with React and Vite
+- Authentication and OTP-based login/signup
+- Brand listing, suggestion, and review system
+- Admin dashboard for brand approvals
+- Bookmarking and user profile features
+- RESTful API integration with the backend
 
-## Expanding the ESLint configuration
+## Tech Stack
+- **Frontend:** React, Vite, CSS Modules
+- **Icons:** React Icons
+- **Routing:** React Router DOM
+- **State Management:** React Hooks, Context API (if used)
+- **API:** Fetch/REST
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Getting Started
+
+### Prerequisites
+- Node.js (v16 or above recommended)
+- npm
+
+### Installation
+1. Navigate to the `client` directory:
+   ```sh
+   cd client
+   ```
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+
+### Running the Development Server
+Start the frontend development server:
+```sh
+npm run dev
+```
+The app will be available at [http://localhost:5173](http://localhost:5173).
+
+### Available Scripts
+- `npm run dev` — Start the development server
+- `npm run build` — Build the app for production
+- `npm run preview` — Preview the production build
+- `npm run lint` — Run ESLint
+
+## Folder Structure
+```
+client/
+  ├── public/           # Static assets
+  ├── src/
+  │   ├── components/   # Reusable React components
+  │   ├── assets/       # Images and icons
+  │   ├── App.jsx       # Main app component
+  │   ├── main.jsx      # Entry point
+  │   └── ...
+  ├── package.json      # Project metadata and scripts
+  └── ...
+```
+
+## Contribution Guidelines
+- Fork the repository and create a new branch for your feature or bugfix.
+- Follow consistent code style and naming conventions.
+- Write clear commit messages.
+- Test your changes before submitting a pull request.
+- For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+This project is licensed under the ISC License.
+
+---
+For backend setup and API documentation, see the `server` directory.

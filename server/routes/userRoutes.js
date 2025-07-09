@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync");
 const passport = require("passport");
-const { default: next } = require("next");
 const reviewCtrl = require("../controllers/reviewController");
 const otpCtrl = require("../controllers/otpController");
 const userCtrl = require("../controllers/userController");

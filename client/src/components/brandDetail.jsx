@@ -103,7 +103,7 @@ function BrandDetail() {
     }
   };
 
-  if (loading) return <div style={{ padding: "2rem" }}>Loading...</div>;
+  if (loading) return <div className="spinner" aria-label="Loading brand details" />;
 
   return (
     <div className="brand-page">
