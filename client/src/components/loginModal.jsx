@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./loginModal.css";
+import { supabase } from "../supabaseClient";
 
 const LoginModal = ({ close }) => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -16,26 +17,24 @@ const LoginModal = ({ close }) => {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
       });
 
-      const data = await res.json();
-      if (res.ok) {
+      if (error) {
+        setMessage("❌ " + error.message);
+      } else {
         localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("token", data.session?.access_token);
         setMessage("✅ Login successful! Redirecting...");
         setTimeout(() => {
           close();
           window.location.reload();
         }, 1500);
-      } else {
-        setMessage(data.error || "❌ Login failed. Please check your credentials.");
       }
     } catch (err) {
-      setMessage("❌ Server error. Please try again.");
+      setMessage("❌ Something went wrong. Try again.");
     } finally {
       setIsLoading(false);
     }
@@ -44,12 +43,12 @@ const LoginModal = ({ close }) => {
   return (
     <div className="login-modal" onClick={close}>
       <div className="login-box" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={close} aria-label="Close modal">
+        <button className="close-btn" onClick={close}>
           ✕
         </button>
-        
+
         <h2>🔐 Welcome Back</h2>
-        
+
         <form onSubmit={handleSubmit}>
           <input
             name="email"
@@ -80,31 +79,21 @@ const LoginModal = ({ close }) => {
             )}
           </button>
         </form>
-        
+
         {message && (
           <p className={message.includes("✅") ? "success" : "error"}>
             {message}
           </p>
         )}
-        
-        <div style={{ 
-          marginTop: '1rem', 
-          textAlign: 'center', 
-          fontSize: '0.875rem',
-          color: 'var(--text-secondary)'
-        }}>
-          Don't have an account?{" "}
-          <a 
-            href="/auth" 
-            style={{ 
-              color: 'var(--primary-color)', 
-              textDecoration: 'none',
-              fontWeight: '600'
-            }}
+
+        <div className="modal-footer">
+          Don’t have an account?{" "}
+          <a
+            href="/auth?signup=true"
             onClick={(e) => {
               e.preventDefault();
               close();
-              window.location.href = '/auth';
+              window.location.href = "/auth?signup=true";
             }}
           >
             Sign up here

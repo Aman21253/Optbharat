@@ -1,131 +1,68 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 import "./auth.css";
 
 function Auth() {
-  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
+
+  // Detect mode from URL
+  const [isLogin, setIsLogin] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("signup") !== "true"; // false = show SignUp
+  });
+
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [signupForm, setSignupForm] = useState({ name: "", email: "", password: "" });
-  const [otp, setOtp] = useState("");
-  const [otpVisible, setOtpVisible] = useState(false);
-  const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [message, setMessage] = useState("");
-  const [resendTimer, setResendTimer] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (isLogin) {
-      setLoginForm({ ...loginForm, [name]: value });
-    } else {
-      setSignupForm({ ...signupForm, [name]: value });
-    }
-  };
-
-  const handleSendOtp = async () => {
-    const email = isLogin ? loginForm.email : signupForm.email;
-    setMessage("");
-
-    if (resendTimer > 0) {
-      setMessage("⏳ Please wait before resending OTP");
-      return;
-    }
-
-    if (!email) {
-      setMessage("⚠️ Please enter your email first");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const res = await fetch("http://localhost:8080/api/users/send-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setOtpVisible(true);
-        setIsOtpVerified(false);
-        setMessage("✅ OTP sent to your email");
-        setResendTimer(60); // Start 60-second countdown
-      } else {
-        setMessage(data.error || "❌ Failed to send OTP");
-      }
-    } catch (err) {
-      setMessage("❌ Server error. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    const email = isLogin ? loginForm.email : signupForm.email;
-    setMessage("");
-
-    if (!otp || otp.length !== 4) {
-      setMessage("⚠️ Please enter a valid 4-digit OTP");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const res = await fetch("http://localhost:8080/api/users/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setIsOtpVerified(true);
-        setMessage("✅ OTP verified successfully");
-      } else {
-        setMessage(data.error || "❌ Invalid OTP. Please try again.");
-      }
-    } catch (err) {
-      setMessage("❌ Server error. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+    isLogin
+      ? setLoginForm((prev) => ({ ...prev, [name]: value }))
+      : setSignupForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!isOtpVerified) {
-      setMessage("⚠️ Please verify your OTP first");
-      return;
-    }
-
     setIsLoading(true);
-    const url = isLogin
-      ? "http://localhost:8080/api/users/login"
-      : "http://localhost:8080/api/users/register";
-
-    const payload = isLogin ? loginForm : signupForm;
+    setMessage("");
 
     try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      if (isLogin) {
+        // Supabase Login
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: loginForm.email,
+          password: loginForm.password,
+        });
 
-      const data = await res.json();
-      if (res.ok) {
-        console.log("Logged in user:", data.user);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("token", data.token);
-        setMessage("✅ Success! Redirecting...");
-        setTimeout(() => navigate("/"), 1000);
+        if (error) {
+          setMessage("❌ " + error.message);
+        } else {
+          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("token", data.session?.access_token);
+          setMessage("✅ Logged in successfully!");
+          setTimeout(() => navigate("/"), 1000);
+        }
       } else {
-        setMessage(data.error || "❌ Authentication failed");
+        // Supabase Signup
+        const { data, error } = await supabase.auth.signUp({
+          email: signupForm.email,
+          password: signupForm.password,
+          options: {
+            data: { name: signupForm.name, role: "user" },
+          },
+        });
+
+        if (error) {
+          setMessage("❌ " + error.message);
+        } else {
+          setMessage("✅ Signup successful! Please check your email to confirm.");
+        }
       }
     } catch (err) {
-      setMessage("❌ Server error. Please try again.");
+      setMessage("❌ Unexpected error. Try again.");
     } finally {
       setIsLoading(false);
     }
@@ -133,54 +70,36 @@ function Auth() {
 
   const currentForm = isLogin ? loginForm : signupForm;
 
-  // Countdown effect for Resend OTP
-  useEffect(() => {
-    let interval;
-    if (resendTimer > 0) {
-      interval = setInterval(() => {
-        setResendTimer((prev) => prev - 1);
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [resendTimer]);
-
   return (
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-logo">
-            MakeInBharat
-          </div>
+          <div className="auth-logo">MakeInBharat</div>
           <h1 className="auth-title">
             {isLogin ? "Welcome Back" : "Join MakeInBharat"}
           </h1>
           <p className="auth-subtitle">
-            {isLogin 
-              ? "Sign in to your account to continue exploring Indian brands"
-              : "Create your account to start discovering and supporting Indian brands"
-            }
+            {isLogin
+              ? "Sign in to continue exploring Indian brands"
+              : "Create your account to support Indian brands"}
           </p>
         </div>
 
         <div className="auth-toggle">
-          <button 
-            className={isLogin ? "active" : ""} 
+          <button
+            className={isLogin ? "active" : ""}
             onClick={() => {
               setIsLogin(true);
               setMessage("");
-              setOtpVisible(false);
-              setIsOtpVerified(false);
             }}
           >
             🔐 Login
           </button>
-          <button 
-            className={!isLogin ? "active" : ""} 
+          <button
+            className={!isLogin ? "active" : ""}
             onClick={() => {
               setIsLogin(false);
               setMessage("");
-              setOtpVisible(false);
-              setIsOtpVerified(false);
             }}
           >
             ✨ Sign Up
@@ -190,122 +109,51 @@ function Auth() {
         <form onSubmit={handleSubmit} className="auth-form">
           {!isLogin && (
             <div className="form-group">
-              <label className="form-label">
-                👤 Full Name
-              </label>
+              <label className="form-label">👤 Full Name</label>
               <input
-                className="form-input"
                 name="name"
                 type="text"
-                placeholder="Enter your full name"
-                onChange={handleChange}
+                placeholder="Enter your name"
                 value={signupForm.name}
+                onChange={handleChange}
                 required
+                className="form-input"
               />
             </div>
           )}
 
           <div className="form-group">
-            <label className="form-label">
-              📧 Email Address
-            </label>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <input
-                className="form-input"
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                value={currentForm.email}
-                onChange={handleChange}
-                required
-                style={{ flex: 1 }}
-              />
-              <button
-                type="button"
-                className="auth-button"
-                onClick={handleSendOtp}
-                disabled={isLoading || resendTimer > 0}
-                style={{ 
-                  padding: '0.75rem 1rem',
-                  fontSize: '0.875rem',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {isLoading ? (
-                  <div className="loading-spinner"></div>
-                ) : otpVisible ? (
-                  resendTimer > 0 ? `${resendTimer}s` : "🔄 Resend"
-                ) : (
-                  "📤 Send OTP"
-                )}
-              </button>
-            </div>
+            <label className="form-label">📧 Email</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="Enter your email"
+              value={currentForm.email}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
           </div>
 
-          {otpVisible && (
-            <div className="form-group">
-              <label className="form-label">
-                🔢 OTP Verification
-              </label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input
-                  className="form-input"
-                  type="text"
-                  placeholder="Enter 4-digit OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  maxLength={4}
-                  required
-                  style={{ flex: 1 }}
-                />
-                <button 
-                  type="button" 
-                  className="auth-button"
-                  onClick={handleVerifyOtp}
-                  disabled={isLoading || !otp || otp.length !== 4}
-                  style={{ 
-                    padding: '0.75rem 1rem',
-                    fontSize: '0.875rem',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  {isLoading ? (
-                    <div className="loading-spinner"></div>
-                  ) : (
-                    "✅ Verify"
-                  )}
-                </button>
-              </div>
-              {resendTimer > 0 && (
-                <p style={{ 
-                  fontSize: "0.875rem", 
-                  color: "var(--text-secondary)", 
-                  marginTop: "0.5rem",
-                  textAlign: 'center'
-                }}>
-                  ⏰ Resend available in <strong>{resendTimer}s</strong>
-                </p>
-              )}
-            </div>
-          )}
-
           <div className="form-group">
-            <label className="form-label">
-              🔒 Password
-            </label>
+            <label className="form-label">🔒 Password</label>
             <input
-              className="form-input"
-              type="password"
               name="password"
+              type="password"
               placeholder="Enter your password"
               value={currentForm.password}
               onChange={handleChange}
               required
+              className="form-input"
             />
           </div>
 
           {message && (
-            <div className={message.includes("✅") ? "success-message" : "error-message"}>
+            <div
+              className={
+                message.includes("✅") ? "success-message" : "error-message"
+              }
+            >
               {message}
             </div>
           )}
@@ -313,7 +161,7 @@ function Auth() {
           <button
             type="submit"
             className="auth-button"
-            disabled={!isOtpVerified || isLoading}
+            disabled={isLoading}
           >
             {isLoading ? (
               <>
@@ -332,26 +180,28 @@ function Auth() {
           {isLogin ? (
             <>
               Don't have an account?{" "}
-              <a href="#" onClick={(e) => {
-                e.preventDefault();
-                setIsLogin(false);
-                setMessage("");
-                setOtpVisible(false);
-                setIsOtpVerified(false);
-              }}>
+              <a
+                href="/auth?signup=true"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsLogin(false);
+                  setMessage("");
+                }}
+              >
                 Sign up here
               </a>
             </>
           ) : (
             <>
               Already have an account?{" "}
-              <a href="#" onClick={(e) => {
-                e.preventDefault();
-                setIsLogin(true);
-                setMessage("");
-                setOtpVisible(false);
-                setIsOtpVerified(false);
-              }}>
+              <a
+                href="/auth"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsLogin(true);
+                  setMessage("");
+                }}
+              >
                 Sign in here
               </a>
             </>

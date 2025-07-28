@@ -1,39 +1,83 @@
 const express = require("express");
 const router = express.Router();
+const { createClient } = require("@supabase/supabase-js");
 
-let suggestions = []; // In-memory array for now
+// Load env
+require("dotenv").config();
 
-// Get all suggestions (for admin)
-router.get("/", (req, res) => {
-  res.json(suggestions);
-});
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
-// Submit new suggestion (from SuggestBrand form)
-router.post("/", (req, res) => {
+// 📥 Submit a new suggestion
+router.post("/", async (req, res) => {
   const suggestion = req.body;
-  suggestion.id = Date.now().toString(); // Unique ID
-  suggestions.push(suggestion);
-  res.status(201).json({ message: "Suggestion submitted", suggestion });
-});
 
-// Approve suggestion
-router.post("/approve/:id", (req, res) => {
-  const { id } = req.params;
-  const suggestion = suggestions.find(s => s.id === id);
-  if (suggestion) {
-    // Normally, you’d move it to the real DB here
-    suggestions = suggestions.filter(s => s.id !== id);
-    res.json({ message: "Suggestion approved", suggestion });
-  } else {
-    res.status(404).json({ message: "Suggestion not found" });
+  try {
+    const { data, error } = await supabase
+      .from("suggestions")
+      .insert([suggestion]);
+
+    if (error) throw error;
+
+    res.status(201).json({ message: "Suggestion submitted", suggestion: data[0] });
+  } catch (err) {
+    console.error("❌ Submission failed:", err.message);
+    res.status(500).json({ error: "Failed to submit suggestion" });
   }
 });
 
-// Reject suggestion
-router.delete("/reject/:id", (req, res) => {
+// 📄 Get all suggestions (for admin)
+router.get("/", async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from("suggestions")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch suggestions" });
+  }
+});
+
+// ✅ Approve suggestion
+router.post("/approve/:id", async (req, res) => {
   const { id } = req.params;
-  suggestions = suggestions.filter(s => s.id !== id);
-  res.json({ message: "Suggestion rejected" });
+
+  try {
+    const { data, error } = await supabase
+      .from("suggestions")
+      .update({ approved: true })
+      .eq("id", id);
+
+    if (error) throw error;
+
+    res.json({ message: "Suggestion approved", suggestion: data[0] });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to approve suggestion" });
+  }
+});
+
+// ❌ Reject suggestion
+router.delete("/reject/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { error } = await supabase
+      .from("suggestions")
+      .delete()
+      .eq("id", id);
+
+    if (error) throw error;
+
+    res.json({ message: "Suggestion rejected" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to reject suggestion" });
+  }
 });
 
 module.exports = router;

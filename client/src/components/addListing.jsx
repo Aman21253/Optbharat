@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient";
+import Header from "../components/header";
 import "./addListing.css";
 
 function AddListing() {
   const [formData, setFormData] = useState({
     name: "",
     website: "",
-    productCategory: "",
-    globalBrand: "",
+    product_category: "",
+    global_brand: "",
     description: "",
-    countryOfOrigin: "India", // Default to India
-    countryOfOperations: "",
+    country_of_origin: "India",
+    country_of_operation: "",
     positioning: "",
   });
 
@@ -20,16 +22,14 @@ function AddListing() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in
     const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
-    
-    // Remove auto-redirect. Only set user if found.
+
     if (storedUser && token) {
       try {
         const userData = JSON.parse(storedUser);
         setUser(userData);
-      } catch (error) {
+      } catch {
         localStorage.removeItem("user");
         localStorage.removeItem("token");
       }
@@ -37,10 +37,8 @@ function AddListing() {
   }, []);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -48,174 +46,151 @@ function AddListing() {
     setIsLoading(true);
     setMessage("");
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setMessage("❌ Please login to submit a listing");
+    if (!user?.id || !user?.email) {
+      setMessage("❌ Please login to submit a listing.");
       setIsLoading(false);
       return;
     }
 
     const payload = {
-      name: formData.name.trim(),
-      website: formData.website.trim(),
-      productCategory: formData.productCategory.trim(),
-      globalBrand: formData.globalBrand.trim(),
-      description: formData.description.trim(),
-      countryOfOrigin: formData.countryOfOrigin,
-      countryOfOperations: formData.countryOfOperations.trim(),
-      positioning: formData.positioning,
-    };
+  name: formData.name.trim(),
+  Website: formData.website.trim(),
+  product_category: formData.product_category.trim(),
+  global_brand: formData.global_brand.trim(),
+  description: formData.description.trim(),
+  country_of_origin: formData.country_of_origin.trim(),
+  country_of_operation: formData.country_of_operation.trim(),
+  positioning: formData.positioning.trim(),
+  approved: false,
+  created_by: user.id,
+};
 
-    // Basic validation
-    if (!payload.name || !payload.productCategory || !payload.description) {
-      setMessage("⚠️ Please fill in all required fields");
+    if (!payload.name || !payload.product_category || !payload.description || !payload.positioning) {
+      setMessage("⚠️ Please fill all required fields.");
       setIsLoading(false);
       return;
     }
 
     try {
-      const res = await fetch("http://localhost:8080/api/brands", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      const { error } = await supabase.from("pending_brand").insert([payload]);
 
-      const data = await res.json();
-      if (res.ok) {
-        setMessage("✅ Listing submitted successfully! Redirecting...");
-        setTimeout(() => navigate("/"), 2000);
+      if (error) {
+        console.error("Insert error:", error.message);
+        setMessage("❌ Failed to submit listing. Please try again.");
       } else {
-        setMessage(data.error || "❌ Failed to submit listing. Please try again.");
+        setMessage("✅ Listing going for approval ! Redirecting...");
+        setTimeout(() => navigate("/"), 2000);
       }
-    } catch (error) {
-      console.error("Submit error:", error);
-      setMessage("❌ Server error. Please try again later.");
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setMessage("❌ Something went wrong.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const activateDevMode = () => {
+    const devUser = { id: 'dev', name: 'Developer', email: 'dev@test.com' };
+    localStorage.setItem("user", JSON.stringify(devUser));
+    localStorage.setItem("token", "dev-token");
+    setUser(devUser);
+    console.log("✅ Dev mode activated:", devUser);
+  };
+
   if (!user) {
     return (
+      <>
+      <Header/>
       <div className="add-form-container">
         <div className="add-form-card">
-          <div className="add-form-header">
-            <h1 className="add-form-title">🔐 Authentication Required</h1>
-            <p className="add-form-subtitle">
-              You need to be logged in to submit a brand listing.<br />
-              <strong>For testing, you can use Dev Mode below.</strong>
-            </p>
-          </div>
-          <div className="debug-info">
-            <h3>🔍 Debug Information:</h3>
-            <p>User data in localStorage: {localStorage.getItem("user") || "None"}</p>
-            <p>Token in localStorage: {localStorage.getItem("token") || "None"}</p>
-          </div>
+          <h1 className="add-form-title">🔐 Authentication Required</h1>
+          <p className="add-form-subtitle">
+            Please login or use Dev Mode to test form submission.
+          </p>
+
           <div className="auth-options">
-            <button 
-              className="submit-button"
-              onClick={() => window.location.href = "/auth"}
-            >
+            <button className="submit-button" onClick={() => window.location.href = "/auth"}>
               🔐 Login
             </button>
-            <button 
-              className="submit-button"
-              onClick={() => window.location.href = "/signup"}
-            >
+            <button className="submit-button" onClick={() => window.location.href = "/signup"}>
               ✨ Sign Up
             </button>
-            <button 
-              className="submit-button secondary"
-              onClick={() => {
-                // Temporary bypass for development
-                const devUser = { id: 'dev', name: 'Developer', email: 'dev@test.com' };
-                setUser(devUser);
-                localStorage.setItem("user", JSON.stringify(devUser));
-                localStorage.setItem("token", "dev-token");
-                console.log("Dev mode activated with user:", devUser);
-              }}
-            >
-              🛠️ Dev Mode (Bypass Auth) - Click to Test Form
+            <button className="submit-button secondary" onClick={activateDevMode}>
+              🛠️ Dev Mode (Bypass Auth)
             </button>
+          </div>
+
+          <div className="debug-info">
+            <h3>Debug Info</h3>
+            <p>User: {localStorage.getItem("user") || "None"}</p>
+            <p>Token: {localStorage.getItem("token") || "None"}</p>
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   return (
     <div className="add-form-container">
       <div className="add-form-card">
-        <div className="add-form-header">
-          <h1 className="add-form-title">➕ Add New Indian Brand</h1>
-          <p className="add-form-subtitle">
-            Help us grow the MakeInBharat community by adding a new Indian brand listing
-          </p>
-        </div>
+        <h1 className="add-form-title">➕ Add New Indian Brand</h1>
+        <p className="add-form-subtitle">
+          Help us grow the MakeInIndia community by listing an Indian brand.
+        </p>
 
-        <form onSubmit={handleSubmit} className="listing-form" aria-label="Add new brand listing form">
+        <form onSubmit={handleSubmit} className="listing-form">
           <div className="form-section">
             <h3 className="form-section-title">🏢 Brand Information</h3>
-            
+
             <div className="form-group">
-              <label className="form-label required-field">
-                🏷️ Brand Name
-              </label>
-              <input 
+              <label className="form-label required-field">🏷️ Brand Name</label>
+              <input
                 className="form-input"
-                name="name" 
-                placeholder="Enter the brand name"
+                name="name"
                 value={formData.name}
-                onChange={handleChange} 
-                required 
+                onChange={handleChange}
+                placeholder="e.g., TATA, BoAt"
+                required
                 disabled={isLoading}
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">
-                🌐 Website
-              </label>
-              <input 
+              <label className="form-label">🌐 Website</label>
+              <input
                 className="form-input"
-                name="website" 
+                name="website"
                 type="url"
-                placeholder="https://example.com"
                 value={formData.website}
-                onChange={handleChange} 
+                onChange={handleChange}
+                placeholder="https://example.com"
                 disabled={isLoading}
               />
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label required-field">
-                  📦 Product Category
-                </label>
-                <input 
+                <label className="form-label required-field">📦 Product Category</label>
+                <input
                   className="form-input"
-                  name="productCategory" 
-                  placeholder="e.g., Electronics, Footwear, Apparel"
-                  value={formData.productCategory}
-                  onChange={handleChange} 
-                  required 
+                  name="product_category"
+                  value={formData.product_category}
+                  onChange={handleChange}
+                  placeholder="Electronics, Apparel..."
+                  required
                   disabled={isLoading}
                 />
               </div>
 
               <div className="form-group">
-                <label className="form-label">
-                  🌍 Alternative to (Global Brand)
-                </label>
-                <input 
+                <label className="form-label">🌍 Alternative to (Global Brand)</label>
+                <input
                   className="form-input"
-                  name="globalBrand" 
-                  placeholder="e.g., Nike, Apple, Samsung"
-                  value={formData.globalBrand}
-                  onChange={handleChange} 
+                  name="global_brand"
+                  value={formData.global_brand}
+                  onChange={handleChange}
+                  placeholder="e.g., Samsung"
                   disabled={isLoading}
                 />
               </div>
@@ -224,54 +199,48 @@ function AddListing() {
 
           <div className="form-section">
             <h3 className="form-section-title">📝 Description & Positioning</h3>
-            
+
             <div className="form-group">
-              <label className="form-label required-field">
-                💡 Why is this a good alternative?
-              </label>
-              <textarea 
+              <label className="form-label required-field">💡 Why is this a good alternative?</label>
+              <textarea
                 className="form-textarea"
-                name="description" 
-                placeholder="Describe what makes this brand special, its unique features, quality, pricing, and why it's a good alternative to global brands..."
+                name="description"
                 value={formData.description}
-                onChange={handleChange} 
-                required 
-                disabled={isLoading}
+                onChange={handleChange}
+                placeholder="Unique features, affordability, quality..."
+                required
                 rows={4}
+                disabled={isLoading}
               />
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label required-field">
-                  🎯 Market Positioning
-                </label>
-                <select 
+                <label className="form-label required-field">🎯 Market Positioning</label>
+                <select
                   className="form-select"
-                  name="positioning" 
+                  name="positioning"
                   value={formData.positioning}
-                  onChange={handleChange} 
-                  required 
+                  onChange={handleChange}
+                  required
                   disabled={isLoading}
                 >
-                  <option value="">Select positioning</option>
-                  <option value="Premium">Premium - High-end, luxury segment</option>
-                  <option value="Comparable">Comparable - Similar quality to global brands</option>
-                  <option value="Mass-market">Mass-market - Affordable, accessible pricing</option>
-                  <option value="Budget-friendly">Budget-friendly - Cost-effective alternative</option>
+                  <option value="">Select</option>
+                  <option value="Premium">Premium</option>
+                  <option value="Comparable">Comparable</option>
+                  <option value="Mass-market">Mass-market</option>
+                  <option value="Budget-friendly">Budget-friendly</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label className="form-label">
-                  🌍 Country of Operations
-                </label>
-                <input 
+                <label className="form-label">🌍 Country of Operations</label>
+                <input
                   className="form-input"
-                  name="countryOfOperations" 
-                  placeholder="e.g., India, Global, South Asia"
-                  value={formData.countryOfOperations}
-                  onChange={handleChange} 
+                  name="country_of_operation"
+                  value={formData.country_of_operation}
+                  onChange={handleChange}
+                  placeholder="India, Global..."
                   disabled={isLoading}
                 />
               </div>
@@ -279,18 +248,16 @@ function AddListing() {
           </div>
 
           <div className="form-section">
-            <h3 className="form-section-title">🇮🇳 Origin Information</h3>
-            
+            <h3 className="form-section-title">🇮🇳 Origin Info</h3>
+
             <div className="form-group">
-              <label className="form-label required-field">
-                🏛️ Country of Origin
-              </label>
-              <select 
+              <label className="form-label required-field">🏛️ Country of Origin</label>
+              <select
                 className="form-select"
-                name="countryOfOrigin" 
-                value={formData.countryOfOrigin}
-                onChange={handleChange} 
-                required 
+                name="country_of_origin"
+                value={formData.country_of_origin}
+                onChange={handleChange}
+                required
                 disabled={isLoading}
               >
                 <option value="India">🇮🇳 India</option>
@@ -305,50 +272,16 @@ function AddListing() {
             </div>
           )}
 
-          <button 
-            type="submit" 
-            className="submit-button"
-            disabled={isLoading}
-            aria-label="Submit brand listing"
-          >
+          <button type="submit" className="submit-button" disabled={isLoading}>
             {isLoading ? (
               <>
-                <div className="loading-spinner"></div>
-                Submitting...
+                <div className="loading-spinner" /> Submitting...
               </>
             ) : (
-              <>
-                ✨ Submit Brand Listing
-              </>
+              <>✨ Submit Brand Listing</>
             )}
           </button>
         </form>
-
-        <div style={{ 
-          marginTop: '2rem', 
-          textAlign: 'center', 
-          fontSize: '0.875rem',
-          color: 'var(--text-secondary)',
-          padding: '1rem',
-          background: 'var(--bg-secondary)',
-          borderRadius: '0.75rem',
-          border: '1px solid var(--border-color)'
-        }}>
-          <p style={{ margin: '0 0 0.5rem 0' }}>
-            <strong>💡 Tips for a great listing:</strong>
-          </p>
-          <ul style={{ 
-            margin: '0', 
-            paddingLeft: '1.5rem', 
-            textAlign: 'left',
-            lineHeight: '1.6'
-          }}>
-            <li>Provide detailed descriptions of unique features</li>
-            <li>Include information about quality and pricing</li>
-            <li>Mention any certifications or awards</li>
-            <li>Explain why it's a good alternative to global brands</li>
-          </ul>
-        </div>
       </div>
     </div>
   );

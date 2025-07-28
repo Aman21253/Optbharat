@@ -1,40 +1,81 @@
 import React, { useEffect, useState } from "react";
 import "./AdminReview.css";
 
+import { supabase } from "./supabaseClient";
+
 const AdminReview = () => {
   const [suggestions, setSuggestions] = useState([]);
 
-  const fetchSuggestions = () => {
-    fetch("http://localhost:8080/api/brand-suggestions")
-      .then((res) => res.json())
-      .then((data) => setSuggestions(data))
-      .catch((err) => console.error("Error fetching suggestions:", err));
+  const fetchSuggestions = async () => {
+    const { data, error } = await supabase
+      .from("brand_suggestions")
+      .select("*")
+      .eq("approved", false);
+
+    if (error) {
+      console.error("❌ Error fetching suggestions:", error.message);
+    } else {
+      setSuggestions(data || []);
+    }
   };
 
   useEffect(() => {
     fetchSuggestions();
   }, []);
 
-  const approve = (id) => {
-    fetch(`http://localhost:8080/api/brand-suggestions/approve/${id}`, {
-      method: "POST",
-    })
-      .then(() => {
-        alert("Brand approved");
-        fetchSuggestions();
-      })
-      .catch((err) => console.error("Error approving:", err));
+  const approve = async (id) => {
+    const suggestion = suggestions.find((s) => s.id === id);
+    if (!suggestion) return;
+
+    const {
+      name,
+      website,
+      category,
+      target_global_brand,
+      reason,
+      showcase,
+      certifications,
+    } = suggestion;
+
+    const payload = {
+      name,
+      website,
+      product_category: category,
+      global_brand: target_global_brand,
+      description: reason,
+      country_of_origin: "India",
+      positioning: "Comparable",
+      country_of_operations: "India",
+      approved: true,
+      // optionally: createdBy, submitterEmail
+    };
+
+    const { error: insertError } = await supabase
+      .from("brands")
+      .insert([payload]);
+
+    if (insertError) {
+      console.error("❌ Error approving:", insertError.message);
+      alert("❌ Failed to approve");
+    } else {
+      // Optional: delete suggestion
+      await supabase.from("brand_suggestions").delete().eq("id", id);
+      fetchSuggestions();
+    }
   };
 
-  const reject = (id) => {
-    fetch(`http://localhost:8080/api/brand-suggestions/reject/${id}`, {
-      method: "DELETE",
-    })
-      .then(() => {
-        alert("Brand rejected");
-        fetchSuggestions();
-      })
-      .catch((err) => console.error("Error rejecting:", err));
+  const reject = async (id) => {
+    const { error } = await supabase
+      .from("brand_suggestions")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("❌ Error rejecting:", error.message);
+    } else {
+      alert("❌ Brand rejected");
+      fetchSuggestions();
+    }
   };
 
   return (
@@ -48,12 +89,12 @@ const AdminReview = () => {
             <h3>{s.name}</h3>
             <p><strong>Website:</strong> {s.website}</p>
             <p><strong>Category:</strong> {s.category}</p>
-            <p><strong>Target:</strong> {s.globalBrand}</p>
+            <p><strong>Target:</strong> {s.target_global_brand}</p>
             <p><strong>Reason:</strong> {s.reason}</p>
-            <p><strong>Portfolio:</strong> {s.portfolio}</p>
+            <p><strong>Portfolio:</strong> {s.showcase}</p>
             <p><strong>Certifications:</strong> {s.certifications}</p>
-            <button onClick={() => approve(s._id)}>Approve</button>
-            <button onClick={() => reject(s._id)}>Reject</button>
+            <button onClick={() => approve(s.id)}>✅ Approve</button>
+            <button onClick={() => reject(s.id)}>❌ Reject</button>
           </div>
         ))
       )}

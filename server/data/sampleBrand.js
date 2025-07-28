@@ -5,6 +5,7 @@ const sampleBrands = [
     countryOfOperations: "Worldwide",
     productCategory: "Footwear",
     description: "A global leader in sportswear and footwear.",
+    approved: true,
     tags: ["Premium", "Global", "Sports"],
   },
   {
@@ -15,6 +16,8 @@ const sampleBrands = [
     productCategory: "Footwear",
     description: "An Indian D2C brand offering stylish, durable footwear.",
     tags: ["D2C", "Startup", "Indian"],
+    approved: true,
+    website: "https://www.hm.com"
   },
   {
     name: "H&M",
@@ -23,6 +26,7 @@ const sampleBrands = [
     productCategory: "Apparel",
     description: "Global fast-fashion brand.",
     tags: ["Mass-market", "Fashion"],
+    approved: true,
   },
   {
     name: "FabIndia",
@@ -32,6 +36,7 @@ const sampleBrands = [
     productCategory: "Apparel",
     description: "Promotes Indian handlooms and crafts with modern design.",
     tags: ["Sustainable", "Handcrafted", "Indian"],
+    approved: true,
   },
   {
     name: "Sony",
@@ -39,7 +44,8 @@ const sampleBrands = [
     countryOfOperations: "Worldwide",
     productCategory: "Electronics",
     description: "Innovative technology company known for high-quality electronics.",
-    tags: ["Premium", "Innovative", "Global"]
+    tags: ["Premium", "Innovative", "Global"],
+    approved: true,
   },
   {
     name: "Samsung",
@@ -47,7 +53,8 @@ const sampleBrands = [
     countryOfOperations: "Worldwide",
     productCategory: "Electronics",
     description: "Leading manufacturer of consumer electronics and semiconductors.",
-    tags: ["Global", "Tech", "Innovative"]
+    tags: ["Global", "Tech", "Innovative"],
+    approved: true,
   },
   {
     name: "Apple",
@@ -55,7 +62,8 @@ const sampleBrands = [
     countryOfOperations: "Worldwide",
     productCategory: "Electronics",
     description: "Known for its innovative products like iPhone, iPad, and Mac.",
-    tags: ["Premium", "Innovative", "Global"]
+    tags: ["Premium", "Innovative", "Global"],
+    approved: true,
   },
   {
     name: "Dell",
@@ -63,7 +71,8 @@ const sampleBrands = [
     countryOfOperations: "Worldwide",
     productCategory: "Computers",
     description: "Provides a wide range of computers and related products.",
-    tags: ["Tech", "Reliable", "Global"]
+    tags: ["Tech", "Reliable", "Global"],
+    approved: true,
   },
   {
     name: "HP",
@@ -71,7 +80,8 @@ const sampleBrands = [
     countryOfOperations: "Worldwide",
     productCategory: "Computers",
     description: "Offers a variety of personal computing and printing solutions.",
-    tags: ["Tech", "Reliable", "Global"]
+    tags: ["Tech", "Reliable", "Global"],
+    approved: true,
   },
   {
     name: "Lava",
@@ -80,7 +90,8 @@ const sampleBrands = [
     "highlight": true,
     productCategory: "Electronics",
     description: "Indian multinational technology company offering smartphones, laptops, and accessories.",
-    tags: ["Make in India", "Affordable", "Innovative"]
+    tags: ["Make in India", "Affordable", "Innovative"],
+    approved: true,
   },
   {
     name: "Micromax",
@@ -89,7 +100,8 @@ const sampleBrands = [
     "highlight": true,
     productCategory: "Electronics",
     description: "Leading Indian consumer electronics brand known for smartphones and home appliances.",
-    tags: ["Affordable", "Innovative", "Indian"]
+    tags: ["Affordable", "Innovative", "Indian"],
+    approved: true,
   },
   {
     name: "boAt",
@@ -98,7 +110,8 @@ const sampleBrands = [
     "highlight": true,
     productCategory: "Audio Devices",
     description: "Popular Indian brand offering stylish and affordable audio products.",
-    tags: ["Trendy", "Affordable", "Indian"]
+    tags: ["Trendy", "Affordable", "Indian"],
+    approved: true,
   },
   {
     name: "Havells",
@@ -107,7 +120,8 @@ const sampleBrands = [
     "highlight": true,
     productCategory: "Electrical Equipment",
     description: "Indian multinational electrical equipment company manufacturing home appliances and lighting.",
-    tags: ["Sustainable", "Innovative", "Indian"]
+    tags: ["Sustainable", "Innovative", "Indian"],
+    approved: true,
   },
   {
     name: "iBall",
@@ -116,7 +130,8 @@ const sampleBrands = [
     "highlight": true,
     productCategory: "Computers",
     description: "Indian brand offering a range of computing and consumer electronics products.",
-    tags: ["Budget-friendly", "Innovative", "Indian"]
+    tags: ["Budget-friendly", "Innovative", "Indian"],
+    approved: true,
   }
 ];
 module.exports = sampleBrands;

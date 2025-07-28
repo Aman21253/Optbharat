@@ -1,6 +1,9 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate  } from "react-router-dom";
-//import Header from "./header";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import Header from "./components/header";
+import Footer from "./components/footer";
+import { supabase } from "./supabaseClient";
+
 import Home from "./Home";
 import SuggestBrand from "./SuggestBrand";
 import AdminReview from "./AdminReview";
@@ -10,18 +13,33 @@ import BrandDetail from "./components/brandDetail";
 import AddListing from "./components/addListing";
 import AdminBrands from "./components/adminBrand";
 import Bookmarks from "./components/bookmark";
+import WhyIndianProduct from "./components/reason";
 import VerifyOtp from "./components/verifyOtp";
-import Footer from "./components/footer";
+import AdminPending from "./pages/AdminPending";
 
-const ProtectedAdminRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user || (user.role !== "admin" && user.role !== "superadmin")) {
+const ProtectedAdminRoute = ({ user, children }) => {
+  const role = user?.user_metadata?.role || user?.role;
+
+  if (!user || (role !== "admin" && role !== "superadmin")) {
     return <Navigate to="/" replace />;
   }
+
   return children;
 };
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (data?.session?.user) {
+        setUser(data.session.user);
+      }
+    };
+    getSession();
+  }, []);
+
   return (
     <div className="app-wrapper">
       <Router>
@@ -30,14 +48,19 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
             <Route path="/suggest" element={<SuggestBrand />} />
-            <Route path="/admin" element={<AdminReview />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/add" element={<AddListing />} />
-            <Route path="/admin/brands" element={<AdminBrands />} />
             <Route path="/brands/:id" element={<BrandDetail />} />
             <Route path="/bookmarks" element={<Bookmarks />} />
-            <Route path="/admin" element={ <ProtectedAdminRoute>
+            <Route path="/admin/pending" element={<AdminPending />} />
+            <Route path="/reason" element={<WhyIndianProduct />} />
+
+            {/* Protected Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedAdminRoute user={user}>
                   <AdminReview />
                 </ProtectedAdminRoute>
               }
@@ -45,12 +68,11 @@ function App() {
             <Route
               path="/admin/brands"
               element={
-                <ProtectedAdminRoute>
+                <ProtectedAdminRoute user={user}>
                   <AdminBrands />
                 </ProtectedAdminRoute>
               }
             />
-
           </Routes>
         </div>
         <Footer />

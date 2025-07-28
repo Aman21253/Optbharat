@@ -1,31 +1,49 @@
-const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendOtp } = require("./otpController");
+const { createClient } = require('@supabase/supabase-js');
+require("dotenv").config();
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 // Sign Up
 exports.registerUser = async (req, res) => {
   const { name, email, password } = req.body;
+
   try {
-    const existing = await User.findOne({ email });
+    const { data: existing, error: findError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
     if (existing) return res.status(400).json({ error: "Email already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     let role = "user";
+
     if (email === process.env.TRUSTED_ADMIN_EMAIL) {
       role = "admin";
     } else if (email === process.env.TRUSTED_SUPERADMIN_EMAIL) {
       role = "superadmin";
     }
-    const user = await User.create({ name, email, password: hashedPassword, role });
 
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-);
+    const { data: user, error } = await supabase
+      .from("users")
+      .insert([{ name, email, password: hashedPassword, role }])
+      .select()
+      .single();
 
-    // Trigger OTP
+    if (error) throw error;
+
+    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    // Send OTP (optional for production)
     await sendOtp(
       { body: { email } },
       {
@@ -36,7 +54,7 @@ exports.registerUser = async (req, res) => {
 
     res.status(201).json({
       message: "User registered. OTP sent.",
-      user: { _id: user._id, name: user.name, email: user.email, role:user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (err) {
@@ -50,28 +68,24 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
     if (!user) return res.status(404).json({ error: "User not found" });
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: "Incorrect password" });
 
-    const token = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
-    // // ✅ Send OTP before response
-    // await require("./otpController").sendOtp({ body: { email } }, {
-    //   json: () => {},
-    //   status: () => ({ json: () => {} }),
-    // });
-
-    // ✅ Now send response
     res.json({
       message: "Login successful",
-      user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
       token,
     });
   } catch (err) {
@@ -80,43 +94,65 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-exports.suggestAlternative = async (req, res) => {
-  res.send("Suggestion submitted");
-};
-
+// Bookmark Brand
 exports.bookmarkBrand = async (req, res) => {
   const { userId, brandId } = req.body;
 
   try {
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const { data: existing, error: fetchError } = await supabase
+      .from("bookmark")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("brand_id", brandId)
+      .single();
 
-    const index = user.bookmarks.indexOf(brandId);
-
-    if (index === -1) {
-      user.bookmarks.push(brandId); // Add
+    if (existing) {
+      // Unbookmark
+      await supabase
+        .from("bookmark")
+        .delete()
+        .eq("id", existing.id);
     } else {
-      user.bookmarks.splice(index, 1); // Remove
+      // Bookmark
+      await supabase
+        .from("bookmark")
+        .insert([{ user_id: userId, brand_id: brandId }]);
     }
 
-    await user.save();
-    res.json({ bookmarks: user.bookmarks });
+    const { data: bookmarks } = await supabase
+      .from("bookmark")
+      .select("brand_id")
+      .eq("user_id", userId);
+
+    res.json({ bookmarks: bookmarks.map(b => b.brand_id) });
   } catch (err) {
+    console.error("Bookmark error:", err);
     res.status(500).json({ error: "Bookmark failed" });
   }
 };
 
+// Get Bookmarks
 exports.getBookmarks = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId).populate("bookmarks");
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const { data, error } = await supabase
+      .from("bookmark")
+      .select("brand_id")
+      .eq("user_id", req.params.userId);
 
-    res.json({ bookmarks: user.bookmarks });
+    if (error) throw error;
+
+    res.json({ bookmarks: data.map(b => b.brand_id) });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch bookmarks" });
   }
 };
 
+// Placeholder for upvote
 exports.upvoteBrand = async (req, res) => {
   res.send("Brand upvoted");
+};
+
+// Placeholder for suggestion
+exports.suggestAlternative = async (req, res) => {
+  res.send("Suggestion submitted");
 };

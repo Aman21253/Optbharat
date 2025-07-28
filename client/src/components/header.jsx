@@ -1,92 +1,76 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+// import LoginModal from "./loginModal";
 import LogoutModal from "./logoutModal";
+import { supabase } from "../supabaseClient";
 import "./header.css";
 
 const Header = ({ searchTerm, setSearchTerm }) => {
   const [user, setUser] = useState(null);
+  // const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Check localStorage for user on mount
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (stored) {
-      setUser(JSON.parse(stored));
-    }
+    const getUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session?.user) {
+        const { id, email, user_metadata } = data.session.user;
+        setUser({ id, email, ...user_metadata });
+      } else {
+        setUser(null);
+      }
+    };
+
+    getUser();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const { id, email, user_metadata } = session.user;
+        setUser({ id, email, ...user_metadata });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
-  // Logout handler
-  const handleLogoutConfirm = () => {
-    localStorage.removeItem("user");
+  const handleLogoutConfirm = async () => {
+    await supabase.auth.signOut();
     setUser(null);
     setShowLogoutModal(false);
-    setIsMobileMenuOpen(false);
     navigate("/");
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
   };
 
   return (
     <>
       <header className="header">
-        <Link to="/" className="logo" onClick={closeMobileMenu}>
-          MakeInBharat
-        </Link>
-
+        <Link to="/" className="logo">OptBharat</Link>
         <input
           type="text"
           className="header-search"
-          placeholder="🔍 Search brands..."
+          placeholder="Search brands..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-
-        <button 
-          className="mobile-menu-btn" 
-          onClick={toggleMobileMenu}
-          aria-label="Toggle mobile menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <nav className={`nav-links ${isMobileMenuOpen ? 'active' : ''}`}>
-          <Link to="/bookmarks" className="nav-link" onClick={closeMobileMenu}>
-            📚 My Bookmarks
-          </Link>
-          <Link to="/add" className="nav-link" onClick={closeMobileMenu}>
-            ➕ Add Listing
-          </Link>
-          {user?.role === "admin" || user?.role === "superadmin" ? (
-            <Link to="/admin/brands" className="nav-link" onClick={closeMobileMenu}>
-              ⚙️ Admin Panel
-            </Link>
-          ) : null}
-
+        <nav className="nav-links">
+          <Link to="/bookmarks">📚 My Bookmarks</Link>
+          <Link to="/add">➕ Add Listing</Link>
+          <Link to="/reason">🇮🇳 Why Indian Product</Link>
           {!user ? (
-            <Link to="/auth" className="nav-link" onClick={closeMobileMenu}>
-              🔐 Login
-            </Link>
-          ) : (
-            <button 
-              onClick={() => setShowLogoutModal(true)} 
-              className="logout-btn"
-            >
-              👋 Logout
+            <button onClick={() => navigate("/auth")} className="nav-link">
+              <b>🔐 Login</b>
             </button>
+          ) : (
+            <button onClick={() => setShowLogoutModal(true)} className="logout-btn">👋 Logout</button>
           )}
         </nav>
       </header>
-      
+
+      {/* {showLoginModal && <LoginModal close={() => setShowLoginModal(false)} />} */}
       {showLogoutModal && (
         <LogoutModal
           onCancel={() => setShowLogoutModal(false)}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./brandDetail.css";
 import { useParams } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 
 function BrandDetail() {
   const { id } = useParams();
@@ -9,97 +10,86 @@ function BrandDetail() {
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = localStorage.getItem("token");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getSessionUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      setUser(data?.session?.user || null);
+    };
+    getSessionUser();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const brandRes = await fetch(`http://localhost:8080/api/brands/${id}`);
-        const brandData = await brandRes.json();
+        const { data: brandData, error: brandError } = await supabase
+          .from("brands")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (brandError) throw brandError;
         setBrand(brandData);
 
-        if (!token) {
-          console.warn("⚠️ No token found. Skipping review fetch.");
-          setReviews([]);
-          return;
-        }
+        const { data: reviewData, error: reviewError } = await supabase
+          .from("reviews")
+          .select("*")
+          .eq("brand_id", id)
+          .order("created_at", { ascending: false });
 
-        const reviewRes = await fetch(`http://localhost:8080/api/reviews/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!reviewRes.ok) {
-          console.error("❌ Review fetch failed with status", reviewRes.status);
-          setReviews([]);
-        } else {
-          const reviewData = await reviewRes.json();
-          setReviews(Array.isArray(reviewData) ? reviewData : []);
-        }
+        if (reviewError) throw reviewError;
+        setReviews(reviewData || []);
       } catch (err) {
-        console.error("Error fetching brand or reviews:", err);
+        console.error("Fetch error:", err.message);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [id, token]);
+  }, [id]);
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
+    if (!user) return;
 
-    try {
-      const res = await fetch("http://localhost:8080/api/reviews", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          brandId: id,
-          rating,
-          comment,
-        }),
-      });
+    const payload = {
+      brand_id: id,
+      rating,
+      comment,
+      user_id: user.id,
+      user_name: user.user_metadata?.name || user.email,
+    };
 
-      const data = await res.json();
+    const { data, error } = await supabase
+      .from("reviews")
+      .insert([payload])
+      .select()
+      .single();
 
-      if (res.ok) {
-        setReviews([data.review, ...reviews]);
-        setRating(5);
-        setComment("");
-      } else {
-        alert(data.error || "Failed to submit review");
-      }
-    } catch (err) {
-      alert("Server error submitting review");
+    if (error) {
+      alert("❌ Failed to submit review.");
+    } else {
+      setReviews([data, ...reviews]);
+      setComment("");
+      setRating(5);
     }
   };
 
   const handleDeleteReview = async (reviewId) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
-  
-    try {
-      const res = await fetch(`http://localhost:8080/api/reviews/${reviewId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      const data = await res.json();
-  
-      if (res.ok) {
-        setReviews(reviews.filter((r) => r._id !== reviewId));
-      } else {
-        alert(data.error || "Failed to delete review");
-      }
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Server error deleting review");
+
+    const { error } = await supabase
+      .from("reviews")
+      .delete()
+      .eq("id", reviewId)
+      .eq("user_id", user.id);
+
+    if (error) {
+      alert("❌ Failed to delete review.");
+    } else {
+      setReviews(reviews.filter((r) => r.id !== reviewId));
     }
   };
 
@@ -109,9 +99,9 @@ function BrandDetail() {
     <div className="brand-page">
       <div className="brand-card">
         <h2>{brand.name}</h2>
-        <p><strong>Country of Origin:</strong> {brand.countryOfOrigin || "N/A"}</p>
-        <p><strong>Country of Operation:</strong> {brand.countryOfOperation || "N/A"}</p>
-        <p><strong>Category:</strong> {brand.productCategory || "N/A"}</p>
+        <p><strong>Country of Origin:</strong> {brand.country_of_origin || "N/A"}</p>
+        <p><strong>Country of Operation:</strong> {brand.country_of_operation || "N/A"}</p>
+        <p><strong>Category:</strong> {brand.product_category || "N/A"}</p>
         <p><strong>Description:</strong> {brand.description || "N/A"}</p>
         {brand.website && (
           <p>
@@ -125,7 +115,7 @@ function BrandDetail() {
 
       <div className="review-form-card">
         <h3>Submit a Review</h3>
-        {token ? (
+        {user ? (
           <form onSubmit={handleSubmitReview}>
             <label>
               Rating:
@@ -134,9 +124,7 @@ function BrandDetail() {
                 onChange={(e) => setRating(Number(e.target.value))}
               >
                 {[1, 2, 3, 4, 5].map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
+                  <option key={r} value={r}>{r}</option>
                 ))}
               </select>
             </label>
@@ -160,22 +148,26 @@ function BrandDetail() {
           <p>No reviews yet.</p>
         ) : (
           reviews.map((review) => (
-            <div key={review._id} className="review-card">
-              <p>
-                <strong>{review.userName || "Anonymous"}</strong> ⭐{" "}
-                {review.rating}/5
-              </p>
+            <div key={review.id} className="review-card">
+              <p><strong>{review.user_name}</strong> ⭐ {review.rating}/5</p>
               <p>{review.comment}</p>
-              <small>{new Date(review.createdAt).toLocaleString()}</small>
-
-              {user?._id === review.userId && (
-          <button
-            onClick={() => handleDeleteReview(review._id)}
-            style={{ marginTop: "5px", background: "red", color: "white", border: "none", padding: "5px 10px", borderRadius: "4px", cursor: "pointer" }}
-          >
-            Delete
-          </button>
-        )}
+              <small>{new Date(review.created_at).toLocaleString()}</small>
+              {user?.id === review.user_id && (
+                <button
+                  onClick={() => handleDeleteReview(review.id)}
+                  style={{
+                    marginTop: "5px",
+                    background: "red",
+                    color: "white",
+                    border: "none",
+                    padding: "5px 10px",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           ))
         )}

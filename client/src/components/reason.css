@@ -1,0 +1,119 @@
+/* reason.css */
+
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: #fdfdfd;
+  color: #2c3e50;
+}
+
+h1, h2 {
+  scroll-margin-top: 100px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #166534;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e3a8a;
+}
+
+section {
+  background: #ffffff;
+  padding: 1.8rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s ease-in-out;
+}
+
+section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+ul {
+  padding-left: 1.2rem;
+  list-style-type: disc;
+  color: #374151;
+  margin-top: 0.5rem;
+}
+
+p {
+  color: #374151;
+  line-height: 1.6;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-green-800 {
+  color: #166534;
+}
+
+.text-indigo-600 {
+  color: #4f46e5;
+}
+
+.text-blue-700 {
+  color: #1d4ed8;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.max-w-4xl {
+  max-width: 64rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.py-10 {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.space-y-10 > * + * {
+  margin-top: 2.5rem;
+}
+
+.list-inside {
+  list-style-position: inside;
+}
+
+.shadow-sm {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.rounded-xl {
+  border-radius: 1rem;
+}
+
+.border {
+  border-width: 1px;
+}

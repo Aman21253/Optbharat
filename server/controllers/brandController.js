@@ -1,58 +1,72 @@
-const Brand = require("../models/brand");
-const Alternative = require("../models/alternatives");
+require("dotenv").config();
+const { createClient } = require('@supabase/supabase-js');
 const Suggestion = require("../models/brandSuggestion");
 
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
+
+// ✅ Get all approved brands with optional search filters
 exports.getAllBrands = async (req, res) => {
   try {
-    const { name, countryOfOrigin, productCategory } = req.query;
+    const { name, country_of_origin, product_category } = req.query;
 
-    const query = { approved: true };
+    let query = supabase
+      .from("brands")
+      .select("*")
+      .eq("approved", true);
 
-    if (name || countryOfOrigin || productCategory) {
-      query.$or = [];
-
-      if (name) {
-        query.$or.push({ name: { $regex: name, $options: "i" } });
-      }
-
-      if (countryOfOrigin) {
-        query.$or.push({ countryOfOrigin: { $regex: countryOfOrigin, $options: "i" } });
-      }
-
-      if (productCategory) {
-        query.$or.push({ productCategory: { $regex: productCategory, $options: "i" } });
-      }
+    if (name) {
+      query = query.ilike("name", `%${name}%`);
+    }
+    if (country_of_origin) {
+      query = query.ilike("country_of_origin", `%${country_of_origin}%`);
+    }
+    if (product_category) {
+      query = query.ilike("product_category", `%${product_category}%`);
     }
 
-    const brands = await Brand.find(query);
-    
-    res.status(200).json(brands);
+    const { data, error } = await query;
+
+    if (error) return res.status(500).json({ error: error.message });
+
+    res.status(200).json(data);
   } catch (err) {
-    console.error("❌ Error fetching brands:", err);
-    res.status(500).json({ error: "Error fetching brands" });
+    console.error("Supabase fetch error:", err);
+    res.status(500).json({ error: "Failed to fetch brands from Supabase" });
   }
 };
+
+// ✅ Get single brand by ID
 exports.getBrandById = async (req, res) => {
-  try {
-    const brand = await Brand.findById(req.params.id);
-    if (!brand) {
-      return res.status(404).json({ error: "Brand not found" });
-    }
-    res.json(brand);
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
+  const { data, error } = await supabase
+    .from("brands")
+    .select("*")
+    .eq("id", req.params.id)
+    .single();
+
+  if (error) {
+    return res.status(404).json({ error: "Brand not found" });
   }
+
+  res.json(data);
 };
 
+// ✅ Submit new brand (pending approval)
 exports.createBrand = async (req, res) => {
   try {
-    const brand = new Brand({
+    const payload = {
       ...req.body,
       approved: false,
       createdBy: req.user.userId,
       submitterEmail: req.user.email,
-    });
-    await brand.save();
+    };
+
+    const { error } = await supabase.from("brands").insert([payload]);
+
+    if (error) throw error;
+
     res.status(201).json({ message: "Listing submitted for approval." });
   } catch (err) {
     console.error("Brand submit error:", err);
@@ -60,16 +74,22 @@ exports.createBrand = async (req, res) => {
   }
 };
 
+// ✅ Add a brand directly (admin only)
 exports.addBrand = async (req, res) => {
   try {
-    const brand = new Brand(req.body);
-    await brand.save();
-    res.status(201).json({ message: "Brand added successfully" })
-  }catch(err){
-    res.status(400).json({ error: "Failed to add brand" });;
+    const { error } = await supabase
+      .from("brands")
+      .insert([{ ...req.body, approved: true }]);
+
+    if (error) throw error;
+
+    res.status(201).json({ message: "Brand added successfully" });
+  } catch (err) {
+    res.status(400).json({ error: "Failed to add brand" });
   }
 };
 
+// ✅ Suggest brand via MongoDB
 exports.submitBrandSuggestion = async (req, res) => {
   try {
     const suggestion = new Suggestion(req.body);
@@ -80,57 +100,76 @@ exports.submitBrandSuggestion = async (req, res) => {
   }
 };
 
+// ✅ Get pending brands
 exports.getPendingBrands = async (req, res) => {
-  try {
-    const pending = await Brand.find({ approved: false });
-    res.json(pending);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch pending brands" });
+  const { data, error } = await supabase
+    .from("brands")
+    .select("*")
+    .eq("approved", false);
+
+  if (error) {
+    return res.status(500).json({ error: "Failed to fetch pending brands" });
   }
+
+  res.json(data);
 };
 
+// ✅ Approve a brand (by ID)
 exports.approveBrand = async (req, res) => {
-  try {
-    const brand = await Brand.findById(req.params.id);
-    if (!brand) return res.status(404).json({ error: "Brand not found" });
+  const { data, error } = await supabase
+    .from("brands")
+    .update({ approved: true })
+    .eq("id", req.params.id);
 
-    brand.approved = true;
-    await brand.save();
-
-    res.json({ message: "Brand approved", brand });
-  } catch (err) {
-    console.error("Error approving brand:", err);
-    res.status(500).json({ error: "Failed to approve brand" });
+  if (error || data.length === 0) {
+    return res.status(500).json({ error: "Failed to approve brand" });
   }
+
+  res.json({ message: "Brand approved", brand: data[0] });
 };
 
+// ✅ Get alternatives for brand from Supabase
 exports.getAlternativesForBrand = async (req, res) => {
   try {
-    const alternatives = await Alternative.find({ globalBrandId: req.params.id });
-    res.status(200).json(alternatives);
+    const { data, error } = await supabase
+      .from("alternatives")
+      .select("*")
+      .eq("globalBrandId", req.params.id);
+
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.status(200).json(data);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch alternatives" });
   }
 };
 
+// ✅ Delete brand with ownership check
 exports.deleteBrand = async (req, res) => {
   try {
-    const brand = await Brand.findByIdAndDelete(req.params.id);
-    if (!brand) {
+    const { data: brand, error: findError } = await supabase
+      .from("brands")
+      .select("*")
+      .eq("id", req.params.id)
+      .single();
+
+    if (findError || !brand) {
       return res.status(404).json({ error: "Brand not found" });
     }
-    const email = brand.submitterEmail;
-    if (brand.createdBy?.toString() !== req.user.userId) {
+
+    if (brand.createdBy !== req.user.userId) {
       return res.status(403).json({ error: "Unauthorized" });
     }
-    await brand.deleteOne();
-    if (email) {
-    await sendEmail({
-      to: email,
-      subject: "Your brand listing was not approved",
-      text: `Hi, your submitted brand "${brand.name}" was not approved by the admin.`,
-    });
-  }
+
+    const { error: deleteError } = await supabase
+      .from("brands")
+      .delete()
+      .eq("id", req.params.id);
+
+    if (deleteError) throw deleteError;
+
     res.json({ message: "Brand deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: "Error deleting brand" });

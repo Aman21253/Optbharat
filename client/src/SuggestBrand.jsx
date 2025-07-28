@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./SuggestBrand.css";
+import { supabase } from "./supabaseClient";
 
 const SuggestBrand = () => {
   const [formData, setFormData] = useState({
@@ -24,36 +25,41 @@ const SuggestBrand = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
 
     try {
-      console.log("Submitting:", formData);
-      const res = await fetch("http://localhost:8080/api/brand-suggestions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const { error } = await supabase.from("brand_suggestions").insert([
+        {
+          name: formData.name,
+          logo_url: formData.logoUrl,
+          website: formData.website,
+          category: formData.category,
+          target_global_brand: formData.targetGlobalBrand,
+          reason: formData.reason,
+          showcase: formData.showcase,
+          certifications: formData.certifications,
         },
-        body: JSON.stringify(formData),
-      });
+      ]);
 
-      if (!res.ok) {
-        throw new Error("Failed to submit suggestion.");
+      if (error) {
+        console.error("Supabase insert error:", error.message);
+        setMessage("❌ Failed to submit suggestion.");
+      } else {
+        setMessage("✅ Brand suggestion submitted successfully!");
+        setFormData({
+          name: "",
+          logoUrl: "",
+          website: "",
+          category: "",
+          targetGlobalBrand: "",
+          reason: "",
+          showcase: "",
+          certifications: "",
+        });
       }
-
-      const result = await res.json();
-      setMessage("Brand suggestion submitted successfully!");
-      setFormData({
-        name: "",
-        logoUrl: "",
-        website: "",
-        category: "",
-        targetGlobalBrand: "",
-        reason: "",
-        showcase: "",
-        certifications: "",
-      });
-    } catch (error) {
-      console.error("Error submitting brand:", error);
-      setMessage("Error submitting brand. Please try again.");
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setMessage("❌ Server error. Please try again.");
     }
   };
 
@@ -62,63 +68,14 @@ const SuggestBrand = () => {
       <h2>Suggest an Indian Brand</h2>
       {message && <p className="message">{message}</p>}
       <form className="suggest-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Brand Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="logoUrl"
-          placeholder="Logo URL"
-          value={formData.logoUrl}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="website"
-          placeholder="Website"
-          value={formData.website}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="category"
-          placeholder="Category (e.g., Footwear, Electronics)"
-          value={formData.category}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="targetGlobalBrand"
-          placeholder="Target Global Brand"
-          value={formData.targetGlobalBrand}
-          onChange={handleChange}
-        />
-        <textarea
-          name="reason"
-          placeholder="Why is this a good alternative?"
-          value={formData.reason}
-          onChange={handleChange}
-          required
-        ></textarea>
-        <textarea
-          name="showcase"
-          placeholder="Product Showcase or Portfolio (optional)"
-          value={formData.showcase}
-          onChange={handleChange}
-        ></textarea>
-        <input
-          type="text"
-          name="certifications"
-          placeholder="Certifications or Accolades (optional)"
-          value={formData.certifications}
-          onChange={handleChange}
-        />
+        <input name="name" placeholder="Brand Name" value={formData.name} onChange={handleChange} required />
+        <input name="logoUrl" placeholder="Logo URL" value={formData.logoUrl} onChange={handleChange} />
+        <input name="website" placeholder="Website" value={formData.website} onChange={handleChange} />
+        <input name="category" placeholder="Category" value={formData.category} onChange={handleChange} required />
+        <input name="targetGlobalBrand" placeholder="Target Global Brand" value={formData.targetGlobalBrand} onChange={handleChange} />
+        <textarea name="reason" placeholder="Why is this a good alternative?" value={formData.reason} onChange={handleChange} required />
+        <textarea name="showcase" placeholder="Product Showcase or Portfolio" value={formData.showcase} onChange={handleChange} />
+        <input name="certifications" placeholder="Certifications" value={formData.certifications} onChange={handleChange} />
         <button type="submit">Submit Suggestion</button>
       </form>
     </div>
@@ -126,135 +83,3 @@ const SuggestBrand = () => {
 };
 
 export default SuggestBrand;
-
-// import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import "./SuggestBrand.css";
-
-// const SuggestBrand = ({ onNewSuggestion }) => {
-//   const navigate = useNavigate();
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     logoUrl: "",
-//     website: "",
-//     category: "",
-//     targetGlobalBrand: "",
-//     reason: "",
-//     showcase: "",
-//     certifications: "",
-//   });
-
-//   const [message, setMessage] = useState("");
-
-//   const handleChange = (e) => {
-//     setFormData((prev) => ({
-//       ...prev,
-//       [e.target.name]: e.target.value,
-//     }));
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     try {
-//       const res = await fetch("http://localhost:8080/api/brand-suggestions", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(formData),
-//       });
-
-//       if (!res.ok) throw new Error("Failed to submit suggestion.");
-
-//       const result = await res.json();
-
-//       // Add to main brand list
-//       onNewSuggestion({
-//         name: formData.name,
-//         countryOfOrigin: "India",
-//         productCategory: formData.category,
-//         description: formData.reason,
-//         productRange: formData.showcase,
-//         priceSegment: "Mid", // optional default
-//         features: formData.certifications,
-//         website: formData.website,
-//       });
-
-//       setMessage("Suggestion submitted!");
-//       navigate("/"); // redirect to home
-//     } catch (error) {
-//       console.error("Error submitting brand:", error);
-//       setMessage("Error submitting brand.");
-//     }
-//   };
-
-//   return (
-//     <div className="suggest-brand-container">
-//       <h2>Suggest an Indian Brand</h2>
-//       {message && <p className="message">{message}</p>}
-//       <form className="suggest-form" onSubmit={handleSubmit}>
-//         <input
-//           type="text"
-//           name="name"
-//           placeholder="Brand Name"
-//           value={formData.name}
-//           onChange={handleChange}
-//           required
-//         />
-//         <input
-//           type="text"
-//           name="logoUrl"
-//           placeholder="Logo URL"
-//           value={formData.logoUrl}
-//           onChange={handleChange}
-//         />
-//         <input
-//           type="text"
-//           name="website"
-//           placeholder="Website"
-//           value={formData.website}
-//           onChange={handleChange}
-//         />
-//         <input
-//           type="text"
-//           name="category"
-//           placeholder="Category"
-//           value={formData.category}
-//           onChange={handleChange}
-//           required
-//         />
-//         <input
-//           type="text"
-//           name="targetGlobalBrand"
-//           placeholder="Target Global Brand"
-//           value={formData.targetGlobalBrand}
-//           onChange={handleChange}
-//         />
-//         <textarea
-//           name="reason"
-//           placeholder="Why is this a good alternative?"
-//           value={formData.reason}
-//           onChange={handleChange}
-//           required
-//         ></textarea>
-//         <textarea
-//           name="showcase"
-//           placeholder="Product Showcase"
-//           value={formData.showcase}
-//           onChange={handleChange}
-//         ></textarea>
-//         <input
-//           type="text"
-//           name="certifications"
-//           placeholder="Certifications (optional)"
-//           value={formData.certifications}
-//           onChange={handleChange}
-//         />
-//         <button type="submit">Submit</button>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default SuggestBrand;

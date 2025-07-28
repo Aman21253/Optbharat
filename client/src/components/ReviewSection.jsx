@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Header from "../components/header";
 
 function ReviewSection({ listingId }) {
   const [reviews, setReviews] = useState([]);
@@ -62,6 +63,8 @@ function ReviewSection({ listingId }) {
     : "No ratings yet";
 
   return (
+    <>
+    <Header/>
     <div className="review-section" style={{ marginTop: "30px", padding: "20px", border: "1px solid #ddd", borderRadius: "10px" }}>
       <h3>⭐ Reviews & Ratings</h3>
       <p><strong>Average Rating:</strong> {averageRating} / 5</p>
@@ -99,7 +102,7 @@ function ReviewSection({ listingId }) {
         <p>No reviews yet.</p>
       ) : (
         reviews.map((rev) => (
-          <div key={rev._id} className="review-item" style={{ marginBottom: "15px" }}>
+          <div key={rev.id} className="review-item" style={{ marginBottom: "15px" }}>
             <strong>{rev.userName}</strong> – {rev.rating}⭐
             <p>{rev.comment}</p>
             <small style={{ color: "gray" }}>{new Date(rev.createdAt).toLocaleDateString()}</small>
@@ -107,6 +110,7 @@ function ReviewSection({ listingId }) {
         ))
       )}
     </div>
+    </>
   );
 }
 

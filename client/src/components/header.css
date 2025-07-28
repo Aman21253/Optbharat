@@ -2,14 +2,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, #fefefe 100%);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, var(--bg-primary, #fff) 0%, #ffffff 100%);
+  border-bottom: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);;
   position: sticky;
   top: 0;
   z-index: 1000;
   backdrop-filter: blur(10px);
+}
+
+a {
+  text-decoration: none !important;
+  color: black;
 }
 
 .logo {
@@ -18,9 +24,9 @@
   gap: 0.5rem;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary-color);
+  color: red !important;
   text-decoration: none;
-  transition: all 0.2s ease-in-out;
+  transition: transform 0.2s ease;
 }
 
 .logo:hover {
@@ -63,12 +69,15 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  color: white !important;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none !important;
 }
 
 .nav-link {
   position: relative;
   text-decoration: none;
-  color: var(--text-primary);
+  color: rgb(195, 60, 60) !important;
   font-weight: 500;
   font-size: 0.875rem;
   padding: 0.5rem 1rem;
@@ -79,9 +88,12 @@
   gap: 0.25rem;
 }
 
-.nav-link:hover {
+
+.nav-link:hover,
+.logout-btn:hover {
   color: var(--primary-color);
   background-color: var(--bg-accent);
+  content: none;
   transform: translateY(-1px);
 }
 
@@ -93,10 +105,9 @@
   width: 0;
   height: 2px;
   background-color: var(--primary-color);
-  transition: all 0.2s ease-in-out;
   transform: translateX(-50%);
+  transition: width 0.3s ease;
 }
-
 .nav-link:hover::before {
   width: 80%;
 }
@@ -241,4 +252,4 @@
 
 .nav-links.active {
   animation: slideDown 0.2s ease-out;
-}
+} 

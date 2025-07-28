@@ -5,7 +5,7 @@ const suggestionSchema = new mongoose.Schema({
   logo: String,
   website: String,
   category: String,
-  globalBrand: String,
+  global_brand: String,
   reason: String,
   portfolio: String,
   certifications: String,
