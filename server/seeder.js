@@ -8,8 +8,8 @@ const sampleBrands = require("./data/sampleBrand");
 dotenv.config();
 async function seedData() {
   try {
-    await mongoose.connect('mongodb://127.0.0.1:27017/makeinindia');
-    console.log("✅ MongoDB connected");
+    // await mongoose.connect('mongodb://127.0.0.1:27017/makeinindia');
+    // console.log("✅ MongoDB connected");
 
     await Brand.deleteMany({});
 

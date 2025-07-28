@@ -24,16 +24,16 @@ app.use(cors({
 app.use(express.json());
 
 // Connect to MongoDB
-const connectDB = async () => {
-  try {
-    mongoose.connect('mongodb://127.0.0.1:27017/makeinindia');
-    console.log("MongoDB connected");
-  } catch (err) {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1);
-  }
-};
-connectDB();
+// const connectDB = async () => {
+//   try {
+//     mongoose.connect('mongodb://127.0.0.1:27017/makeinindia');
+//     console.log("MongoDB connected");
+//   } catch (err) {
+//     console.error("MongoDB connection error:", err.message);
+//     process.exit(1);
+//   }
+// };
+// connectDB();
 
 // Routes
 app.use("/api/brands", brandRoutes);
@@ -52,7 +52,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
-});
+// const PORT = process.env.PORT || 8080;
+// app.listen(PORT, () => {
+//   console.log(`Server is listening on port ${PORT}`);
+// });
