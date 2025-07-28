@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const protect = require("./middleware/auth");
-const reviewRoutes = require("./routes/ReviewRoute");
+const reviewRoutes = require("./routes/reviewRoute");
 const { errorHandler } = require("./middleware/errorMiddleware");
 const { notFound } = require("./middleware/notFound");
 
