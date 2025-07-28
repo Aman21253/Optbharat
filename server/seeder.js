@@ -1,7 +1,7 @@
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const Brand = require("./models/brand.js");
-const User = require("./models/User.js");
+const User = require("./models/user.js");
 const bcrypt = require("bcryptjs");
 const sampleBrands = require("./data/sampleBrand");
 
