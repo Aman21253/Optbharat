@@ -12,7 +12,7 @@ function ReviewSection({ listingId }) {
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/reviews/${listingId}`);
+      const res = await fetch(`https://makeinindia-ktgc.onrender.com/api/reviews/${listingId}`);
       const data = await res.json();
       setReviews(data);
     } catch (err) {
@@ -31,7 +31,7 @@ function ReviewSection({ listingId }) {
 
     try {
       setLoading(true);
-      const res = await fetch(`http://localhost:8080/api/reviews/${listingId}`, {
+      const res = await fetch(`https://makeinindia-ktgc.onrender.com/api/reviews/${listingId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

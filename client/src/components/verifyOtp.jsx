@@ -13,7 +13,7 @@ function VerifyOtp() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:8080/api/users/verify-otp", {
+      const res = await fetch("https://makeinindia-ktgc.onrender.com/api/users/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),

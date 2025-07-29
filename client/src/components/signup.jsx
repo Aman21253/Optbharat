@@ -22,8 +22,8 @@ function Auth() {
     e.preventDefault();
   
     const url = isLogin
-      ? "http://localhost:8080/api/users/login"
-      : "http://localhost:8080/api/users/register";
+      ? "https://makeinindia-ktgc.onrender.com/api/users/login"
+      : "https://makeinindia-ktgc.onrender.com/api/users/register";
   
     const payload = isLogin
       ? { email: form.email.trim(), password: form.password }
