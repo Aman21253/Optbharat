@@ -147,6 +147,7 @@ a {
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.25rem;
+  z-index: 1001;
 }
 
 .mobile-menu-btn span {
@@ -159,16 +160,26 @@ a {
 .mobile-menu-btn:hover span {
   background-color: var(--primary-color);
 }
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
 
 /* Responsive design */
 @media (max-width: 1024px) {
   .header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
     padding: 1rem;
   }
   
   .header-search {
-    margin: 0 1rem;
-    max-width: 300px;
+    order: 3;
+    flex: 1 1 100%;
+    margin: 0;
+    max-width: none;
   }
   
   .nav-links {
