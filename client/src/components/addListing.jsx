@@ -47,8 +47,9 @@ function AddListing() {
     setMessage("");
 
     if (!user?.id || !user?.email) {
-      setMessage("❌ Please login to submit a listing.");
-      setIsLoading(false);
+      // setMessage("❌ Please login to submit a listing.");
+      // setIsLoading(false);
+      navigate("/auth");
       return;
     }
 
@@ -89,13 +90,13 @@ function AddListing() {
     }
   };
 
-  const activateDevMode = () => {
-    const devUser = { id: 'dev', name: 'Developer', email: 'dev@test.com' };
-    localStorage.setItem("user", JSON.stringify(devUser));
-    localStorage.setItem("token", "dev-token");
-    setUser(devUser);
-    console.log("✅ Dev mode activated:", devUser);
-  };
+  // const activateDevMode = () => {
+  //   const devUser = { id: 'dev', name: 'Developer', email: 'dev@test.com' };
+  //   localStorage.setItem("user", JSON.stringify(devUser));
+  //   localStorage.setItem("token", "dev-token");
+  //   setUser(devUser);
+  //   console.log("✅ Dev mode activated:", devUser);
+  // };
 
   if (!user) {
     return (
@@ -115,15 +116,15 @@ function AddListing() {
             <button className="submit-button" onClick={() => window.location.href = "/signup"}>
               ✨ Sign Up
             </button>
-            <button className="submit-button secondary" onClick={activateDevMode}>
+            {/* <button className="submit-button secondary" onClick={activateDevMode}>
               🛠️ Dev Mode (Bypass Auth)
-            </button>
+            </button> */}
           </div>
 
           <div className="debug-info">
             <h3>Debug Info</h3>
             <p>User: {localStorage.getItem("user") || "None"}</p>
-            <p>Token: {localStorage.getItem("token") || "None"}</p>
+            {/* <p>Token: {localStorage.getItem("token") || "None"}</p> */}
           </div>
         </div>
       </div>

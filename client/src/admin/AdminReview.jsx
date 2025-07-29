@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./AdminReview.css";
 
-import { supabase } from "./supabaseClient";
+import { supabase } from "../supabaseClient";
 
 const AdminReview = () => {
   const [suggestions, setSuggestions] = useState([]);

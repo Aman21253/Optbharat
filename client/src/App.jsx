@@ -6,16 +6,16 @@ import { supabase } from "./supabaseClient";
 
 import Home from "./Home";
 import SuggestBrand from "./SuggestBrand";
-import AdminReview from "./AdminReview";
+import AdminReview from "./admin/AdminReview";
 import SignUp from "./components/signup";
 import Auth from "./components/auth";
 import BrandDetail from "./components/brandDetail";
 import AddListing from "./components/addListing";
-import AdminBrands from "./components/adminBrand";
+import AdminBrands from "./admin/adminBrand";
 import Bookmarks from "./components/bookmark";
 import WhyIndianProduct from "./components/reason";
 import VerifyOtp from "./components/verifyOtp";
-import AdminPending from "./pages/AdminPending";
+import AdminPending from "./admin/AdminPending";
 
 const ProtectedAdminRoute = ({ user, children }) => {
   const role = user?.user_metadata?.role || user?.role;
