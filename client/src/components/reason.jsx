@@ -6,7 +6,6 @@ import Header from "../components/header";
 function WhyIndianProduct() {
   return (
     <>
-    <Header />
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-800">
       <h1 className="text-4xl font-bold text-center text-green-700">
         🇮🇳 Why Indians Should Buy from India

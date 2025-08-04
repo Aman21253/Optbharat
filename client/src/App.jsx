@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom"; // ❌ Remove BrowserRouter here
 import Header from "./components/header";
 import Footer from "./components/footer";
 import { supabase } from "./supabaseClient";
@@ -32,7 +32,7 @@ function App() {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
+      const { data } = await supabase.auth.getSession();
       if (data?.session?.user) {
         setUser(data.session.user);
       }
@@ -42,41 +42,38 @@ function App() {
 
   return (
     <div className="app-wrapper">
-      <Router>
-        <div className="main-content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/verify-otp" element={<VerifyOtp />} />
-            <Route path="/suggest" element={<SuggestBrand />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/add" element={<AddListing />} />
-            <Route path="/brands/:id" element={<BrandDetail />} />
-            <Route path="/bookmarks" element={<Bookmarks />} />
-            <Route path="/admin/pending" element={<AdminPending />} />
-            <Route path="/reason" element={<WhyIndianProduct />} />
+      <div className="main-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Route path="/suggest" element={<SuggestBrand />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/add" element={<AddListing />} />
+          <Route path="/brands/:id" element={<BrandDetail />} />
+          <Route path="/bookmarks" element={<Bookmarks />} />
+          <Route path="/admin/pending" element={<AdminPending />} />
+          <Route path="/reason" element={<WhyIndianProduct />} />
 
-            {/* Protected Admin Routes */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedAdminRoute user={user}>
-                  <AdminReview />
-                </ProtectedAdminRoute>
-              }
-            />
-            <Route
-              path="/admin/brands"
-              element={
-                <ProtectedAdminRoute user={user}>
-                  <AdminBrands />
-                </ProtectedAdminRoute>
-              }
-            />
-          </Routes>
-        </div>
-        <Footer />
-      </Router>
+          <Route
+            path="/admin"
+            element={
+              <ProtectedAdminRoute user={user}>
+                <AdminReview />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/brands"
+            element={
+              <ProtectedAdminRoute user={user}>
+                <AdminBrands />
+              </ProtectedAdminRoute>
+            }
+          />
+        </Routes>
+      </div>
+      <Footer />
     </div>
   );
 }
