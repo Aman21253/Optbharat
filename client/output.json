@@ -1,4 +1,4 @@
-const sampleBrands = [
+[
     {
         "name": "Apple",
         "countryOfOrigin": "USA",
@@ -15253,4 +15253,3 @@ const sampleBrands = [
         "approved": true
     }
 ]
-module.exports = sampleBrands;
