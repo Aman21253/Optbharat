@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom"; // ❌ Remove BrowserRouter here
-import Header from "./components/header";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Footer from "./components/footer";
 import { supabase } from "./supabaseClient";
 

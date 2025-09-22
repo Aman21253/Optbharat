@@ -109,7 +109,7 @@
 }
 
 .footer-logo::before {
-  content: "🇮🇳";
+  /* content: ""; */
   font-size: 1.8rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }

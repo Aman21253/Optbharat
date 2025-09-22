@@ -18,6 +18,11 @@ a {
   color: black;
 }
 
+.logo-img{
+  width: 20px;  /* adjust as needed */
+  height: auto;
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -35,7 +40,7 @@ a {
 }
 
 .logo::before {
-  content: "🇮🇳";
+  /* content: "🇮🇳"; */
   font-size: 1.8rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
