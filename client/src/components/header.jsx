@@ -17,8 +17,10 @@ const Header = ({ searchTerm, setSearchTerm }) => {
       if (data?.session?.user) {
         const { id, email, user_metadata } = data.session.user;
         setUser({ id, email, ...user_metadata });
+        // console.log(`[HEADER] user loaded -> role=${user_metadata?.role || "user"}`);
       } else {
         setUser(null);
+        console.log("[HEADER] no user");
       }
     };
 
@@ -49,9 +51,49 @@ const Header = ({ searchTerm, setSearchTerm }) => {
   return (
     <>
       <header className="header">
-        <Link to="/" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
-          <img src={logo} alt="OptBharat Logo" className="logo-img" />OPTBHARAT
-        </Link>
+        <div className="logo-button-container">
+          <div className="logo-and-why">
+            {/* Logo and text on the same line */}
+            <Link to="/" className="logo" onClick={() => setIsMobileMenuOpen(false)}>
+              <img src={logo} alt="OptBharat Logo" className="logo-img" />
+              OPTBHARAT
+            </Link>
+
+            {/* Button below logo */}
+          </div>
+          <Link to="/reason" className="why-btn" onClick={() => setIsMobileMenuOpen(false)}>
+              🇮🇳 Why Indian Product
+            </Link>
+
+          {/* Desktop-only nav links */}
+          <nav className="nav-links desktop-only">
+            <Link to="/bookmarks">📚 My Bookmarks</Link>
+            <Link to="/add">➕ Add Listing</Link>
+            <Link to="/reason">🇮🇳 Why Indian Product</Link>
+            {user?.role === "admin" || user?.user_metadata?.role === "admin" ? (
+              <div className="admin-dropdown">
+                <span className="admin-label">🛠️ Admin ▾</span>
+                <div className="admin-menu">
+                  <Link to="/admin/pending">Pending Listings</Link>
+                  <Link to="/admin/suggestions">Brand Suggestions</Link>
+                  <Link to="/admin/brands">Unapproved Brands</Link>
+                </div>
+              </div>
+            ) : null}
+
+            {!user ? (
+              <button onClick={() => navigate("/auth")} className="nav-link">
+                🔐 Login
+              </button>
+            ) : (
+              <button onClick={() => setShowLogoutModal(true)} className="logout-btn">
+                👋 Logout
+              </button>
+            )}
+          </nav>
+        </div>
+
+        {/* Search bar */}
         <input
           type="text"
           className="header-search"
@@ -60,20 +102,21 @@ const Header = ({ searchTerm, setSearchTerm }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
+        {/* Mobile menu button */}
         <button
-          className="mobile-menu-btn"
-          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          className="mobile-menu-btn mobile-only"
+          onClick={() => setIsMobileMenuOpen(prev => !prev)}
         >
           <span></span>
           <span></span>
           <span></span>
         </button>
 
-        <nav className={`nav-links ${isMobileMenuOpen ? "active" : ""}`}>
+        {/* Mobile nav links */}
+        <nav className={`nav-links mobile-only ${isMobileMenuOpen ? "active" : ""}`}>
           <Link to="/bookmarks" onClick={() => setIsMobileMenuOpen(false)}>📚 My Bookmarks</Link>
           <Link to="/add" onClick={() => setIsMobileMenuOpen(false)}>➕ Add Listing</Link>
           <Link to="/reason" onClick={() => setIsMobileMenuOpen(false)}>🇮🇳 Why Indian Product</Link>
-
           {user?.role === "admin" || user?.role === "superadmin" || user?.user_metadata?.role === "admin" || user?.user_metadata?.role === "superadmin" ? (
             <div className="admin-dropdown">
               <span className="admin-label">🛠️ Admin ▾</span>
@@ -86,23 +129,11 @@ const Header = ({ searchTerm, setSearchTerm }) => {
           ) : null}
 
           {!user ? (
-            <button
-              onClick={() => {
-                navigate("/auth");
-                setIsMobileMenuOpen(false);
-              }}
-              className="nav-link"
-            >
+            <button onClick={() => { navigate("/auth"); setIsMobileMenuOpen(false); }} className="nav-link">
               🔐 Login
             </button>
           ) : (
-            <button
-              onClick={() => {
-                setShowLogoutModal(true);
-                setIsMobileMenuOpen(false);
-              }}
-              className="logout-btn"
-            >
+            <button onClick={() => { setShowLogoutModal(true); setIsMobileMenuOpen(false); }} className="logout-btn">
               👋 Logout
             </button>
           )}

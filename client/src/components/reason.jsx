@@ -19,6 +19,113 @@ function WhyIndianProduct() {
       </section>
 
       <h1 className="text-4xl font-bold text-center text-green-700">
+          📊 Assumptions Behind the Numbers
+        </h1>
+        <section className="bg-gray-50 p-6 rounded-xl shadow-md border border-gray-200">
+          <ul className="list-disc list-inside space-y-2 text-gray-700">
+            <li>
+              If you spend <b>₹10,000</b>:
+              <ul className="list-disc list-inside ml-6 space-y-1">
+                <li>
+                  <b>Indian apparel brand</b>: 100% of ₹10,000 stays in India.
+                </li>
+                <li>
+                  <b>Foreign brand</b>: 30% stays in India, 70% goes abroad.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <b>Marginal Propensity to Consume (MPC) in India</b>: 0.75 → 75%
+              of income is re-spent locally in each round.
+            </li>
+          </ul>
+        </section>
+      <h1 className="text-4xl font-bold text-center text-green-700">
+          💹 The Ripple Effect of Your ₹10,000
+        </h1>
+        <section className="overflow-x-auto">
+          <table className="w-full text-sm text-left border border-gray-200 shadow-md">
+            <thead className="bg-green-100 text-gray-800">
+              <tr>
+                <th className="px-4 py-2 border">Spending Round</th>
+                <th className="px-4 py-2 border">Indian Brand (₹)</th>
+                <th className="px-4 py-2 border">Retained in India (₹)</th>
+                <th className="px-4 py-2 border">Foreign Brand (₹)</th>
+                <th className="px-4 py-2 border">Retained in India (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-4 py-2 border">Initial Spend</td>
+                <td className="px-4 py-2 border">10,000</td>
+                <td className="px-4 py-2 border">10,000</td>
+                <td className="px-4 py-2 border">10,000</td>
+                <td className="px-4 py-2 border">3,000</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border">Round 2</td>
+                <td className="px-4 py-2 border">7,500</td>
+                <td className="px-4 py-2 border">7,500</td>
+                <td className="px-4 py-2 border">2,250</td>
+                <td className="px-4 py-2 border">2,250</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border">Round 3</td>
+                <td className="px-4 py-2 border">5,625</td>
+                <td className="px-4 py-2 border">5,625</td>
+                <td className="px-4 py-2 border">1,688</td>
+                <td className="px-4 py-2 border">1,688</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border">Round 4</td>
+                <td className="px-4 py-2 border">4,219</td>
+                <td className="px-4 py-2 border">4,219</td>
+                <td className="px-4 py-2 border">1,266</td>
+                <td className="px-4 py-2 border">1,266</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border">Round 5</td>
+                <td className="px-4 py-2 border">3,164</td>
+                <td className="px-4 py-2 border">3,164</td>
+                <td className="px-4 py-2 border">950</td>
+                <td className="px-4 py-2 border">950</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border">Round 6</td>
+                <td className="px-4 py-2 border">2,373</td>
+                <td className="px-4 py-2 border">2,373</td>
+                <td className="px-4 py-2 border">713</td>
+                <td className="px-4 py-2 border">713</td>
+              </tr>
+              <tr className="bg-gray-100 font-semibold">
+                <td className="px-4 py-2 border">Total Retained</td>
+                <td className="px-4 py-2 border">—</td>
+                <td className="px-4 py-2 border text-green-700">32,881</td>
+                <td className="px-4 py-2 border">—</td>
+                <td className="px-4 py-2 border text-red-600">9,867</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className="mt-6 bg-yellow-50 p-6 rounded-xl shadow-md border-l-4 border-yellow-500">
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Conclusion</h2>
+            <p className="text-gray-700">
+              Buying from <b>Indian brands</b>: ₹10,000 creates{" "}
+              <b className="text-green-700">₹32,881</b> worth of economic
+              activity in India.
+            </p>
+            <p className="text-gray-700">
+              Buying from <b>foreign brands</b>: ₹10,000 creates only{" "}
+              <b className="text-red-600">₹9,867</b> worth of economic activity
+              in India.
+            </p>
+            <p className="mt-3 font-medium text-blue-800">
+              👉 That’s a <b>3.3x greater impact</b> when you buy Indian.
+            </p>
+          </div>
+        </section>
+
+      <h1 className="text-4xl font-bold text-center text-green-700">
         💥 Multiply the Impact
       </h1>
       <section>

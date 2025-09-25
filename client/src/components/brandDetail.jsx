@@ -11,11 +11,44 @@ function BrandDetail() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState("");
+
+  const isAdmin = role === "admin" || role === "superadmin";
 
   useEffect(() => {
     const getSessionUser = async () => {
       const { data } = await supabase.auth.getSession();
-      setUser(data?.session?.user || null);
+      const sessionUser = data?.session?.user || null;
+
+      if (sessionUser) {
+        setUser(sessionUser);
+        const metaRole = sessionUser?.user_metadata?.role;
+        if (metaRole) {
+          setRole(metaRole);
+        } else {
+          const raw = localStorage.getItem("user");
+          if (raw) {
+            try {
+              const stored = JSON.parse(raw);
+              if (stored?.role) setRole(stored.role);
+            } catch {}
+          }
+        }
+      } else {
+        const raw = localStorage.getItem("user");
+        if (raw) {
+          try {
+            const stored = JSON.parse(raw);
+            setUser(stored);
+            if (stored?.role) setRole(stored.role);
+          } catch (e) {
+            console.warn("Failed to parse user from localStorage:", e);
+            localStorage.removeItem("user");
+            setUser(null);
+            setRole("");
+          }
+        }
+      }
     };
     getSessionUser();
   }, []);
@@ -77,19 +110,23 @@ function BrandDetail() {
     }
   };
 
-  const handleDeleteReview = async (reviewId) => {
+  const handleDeleteReview = async (reviewId, reviewUserId) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
 
-    const { error } = await supabase
-      .from("reviews")
-      .delete()
-      .eq("id", reviewId)
-      .eq("user_id", user.id);
+    let query = supabase.from("reviews").delete().eq("id", reviewId);
 
+    // normal user can only delete their own review
+    if (!isAdmin) {
+      query = query.eq("user_id", user.id);
+    }
+
+    const { error } = await query;
     if (error) {
       alert("❌ Failed to delete review.");
+      console.error(error);
     } else {
       setReviews(reviews.filter((r) => r.id !== reviewId));
+      alert("✅ Review deleted successfully!");
     }
   };
 
@@ -152,9 +189,10 @@ function BrandDetail() {
               <p><strong>{review.user_name}</strong> ⭐ {review.rating}/5</p>
               <p>{review.comment}</p>
               <small>{new Date(review.created_at).toLocaleString()}</small>
-              {user?.id === review.user_id && (
+
+              {(user?.id === review.user_id || isAdmin) && (
                 <button
-                  onClick={() => handleDeleteReview(review.id)}
+                  onClick={() => handleDeleteReview(review.id, review.user_id)}
                   style={{
                     marginTop: "5px",
                     background: "red",

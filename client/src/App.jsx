@@ -15,6 +15,7 @@ import Bookmarks from "./components/bookmark";
 import WhyIndianProduct from "./components/reason";
 import VerifyOtp from "./components/verifyOtp";
 import AdminPending from "./admin/AdminPending";
+import FloatingAddButton from "./components/floatingAddButton";
 
 const ProtectedAdminRoute = ({ user, children }) => {
   const role = user?.user_metadata?.role || user?.role;
@@ -34,9 +35,26 @@ function App() {
       const { data } = await supabase.auth.getSession();
       if (data?.session?.user) {
         setUser(data.session.user);
+        // const r = data.session.user.user_metadata?.role;
+        // console.log(`[CLIENT] session -> role=${r || "user"}`);
+      } else {
+        console.log("[CLIENT] no session");
       }
     };
     getSession();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const r = session.user.user_metadata?.role;
+        console.log(`[CLIENT] auth change -> role=${r || "user"}`);
+        setUser(session.user);
+      } else {
+        console.log("[CLIENT] auth change -> signed out");
+        setUser(null);
+      }
+    });
+
+    return () => sub?.subscription?.unsubscribe();
   }, []);
 
   return (
@@ -48,11 +66,11 @@ function App() {
           <Route path="/suggest" element={<SuggestBrand />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/auth" element={<Auth />} />
-          <Route path="/add" element={<AddListing />} />
           <Route path="/brands/:id" element={<BrandDetail />} />
           <Route path="/bookmarks" element={<Bookmarks />} />
           <Route path="/admin/pending" element={<AdminPending />} />
           <Route path="/reason" element={<WhyIndianProduct />} />
+          <Route path="/add" element={<AddListing />} />
 
           <Route
             path="/admin"
@@ -71,6 +89,7 @@ function App() {
             }
           />
         </Routes>
+        <FloatingAddButton />
       </div>
       <Footer />
     </div>
