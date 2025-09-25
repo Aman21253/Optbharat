@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LogoutModal from "./logoutModal";
-import logo from "../assets/Logo_OB.png";
+import logo from "../assets/logo.jpeg";
 import { supabase } from "../supabaseClient";
 import "./header.css";
 

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./brandDetail.css";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 function BrandDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [brand, setBrand] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +17,7 @@ function BrandDetail() {
 
   const isAdmin = role === "admin" || role === "superadmin";
 
+  // Fetch logged-in user
   useEffect(() => {
     const getSessionUser = async () => {
       const { data } = await supabase.auth.getSession();
@@ -22,17 +25,8 @@ function BrandDetail() {
 
       if (sessionUser) {
         setUser(sessionUser);
-        const metaRole = sessionUser?.user_metadata?.role;
-        if (metaRole) {
-          setRole(metaRole);
-        } else {
-          const raw = localStorage.getItem("user");
-          if (raw) {
-            try {
-              const stored = JSON.parse(raw);
-              if (stored?.role) setRole(stored.role);
-            } catch {}
-          }
+        if (sessionUser?.user_metadata?.role) {
+          setRole(sessionUser.user_metadata.role);
         }
       } else {
         const raw = localStorage.getItem("user");
@@ -44,8 +38,6 @@ function BrandDetail() {
           } catch (e) {
             console.warn("Failed to parse user from localStorage:", e);
             localStorage.removeItem("user");
-            setUser(null);
-            setRole("");
           }
         }
       }
@@ -53,6 +45,7 @@ function BrandDetail() {
     getSessionUser();
   }, []);
 
+  // Fetch brand + reviews
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -83,12 +76,13 @@ function BrandDetail() {
     fetchData();
   }, [id]);
 
+  // Submit review
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!user) return;
 
     const payload = {
-      brand_id: id,
+      brand_id: Number(id), // ✅ make sure it's numeric
       rating,
       comment,
       user_id: user.id,
@@ -102,6 +96,7 @@ function BrandDetail() {
       .single();
 
     if (error) {
+      console.error("Review insert error:", error);
       alert("❌ Failed to submit review.");
     } else {
       setReviews([data, ...reviews]);
@@ -110,23 +105,38 @@ function BrandDetail() {
     }
   };
 
+  // Delete review
   const handleDeleteReview = async (reviewId, reviewUserId) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
 
     let query = supabase.from("reviews").delete().eq("id", reviewId);
 
-    // normal user can only delete their own review
     if (!isAdmin) {
       query = query.eq("user_id", user.id);
     }
 
     const { error } = await query;
     if (error) {
+      console.error("Review delete error:", error);
       alert("❌ Failed to delete review.");
-      console.error(error);
     } else {
       setReviews(reviews.filter((r) => r.id !== reviewId));
       alert("✅ Review deleted successfully!");
+    }
+  };
+
+  // Delete brand
+  const handleDeleteBrand = async (brandId) => {
+    if (!window.confirm("Are you sure you want to delete this brand?")) return;
+
+    const { error } = await supabase.from("brands").delete().eq("id", brandId);
+
+    if (error) {
+      console.error("Brand delete error:", error);
+      alert("❌ Failed to delete brand.");
+    } else {
+      alert("✅ Brand deleted successfully!");
+      navigate("/"); // redirect after deletion
     }
   };
 
@@ -147,6 +157,15 @@ function BrandDetail() {
               {brand.website}
             </a>
           </p>
+        )}
+
+        {isAdmin && (
+          <button
+            className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+            onClick={() => handleDeleteBrand(brand.id)}
+          >
+            Delete Brand
+          </button>
         )}
       </div>
 
