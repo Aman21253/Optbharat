@@ -17,11 +17,20 @@ require("dotenv").config();
 const app = express();
 
 // Middleware
+// Middleware
 app.use(cors({
   origin: 'https://optbharat.com/',
   credentials: true
 }));
 app.use(express.json());
+
+// Request logger to show role when available
+app.use((req, _res, next) => {
+  const auth = req.headers.authorization;
+  const who = auth ? "token-present" : "no-token";
+  console.log(`[REQ] ${req.method} ${req.originalUrl} (${who})`);
+  next();
+});
 
 // Connect to MongoDB
 // const connectDB = async () => {

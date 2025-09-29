@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 
+// Protect middleware: verify JWT and attach user info from token
 const protect = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -8,22 +8,19 @@ const protect = async (req, res, next) => {
     if (!token) return res.status(401).json({ error: "No token provided" });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
+    // Token is created in userController with { userId, role }, so trust those values
+    req.user = { id: decoded.userId, role: decoded.role };
 
-    if (!user) return res.status(401).json({ error: "Invalid token" });
+    // Log who is calling
+    console.log(
+      `[AUTH] ${req.method} ${req.originalUrl} -> userId=${req.user.id} role=${req.user.role}`
+    );
 
-    req.user = user; // attach user to req
     next();
   } catch (err) {
-    console.error( err,"❌ Invalid or missing token");
+    console.error("❌ Invalid or missing token:", err?.message || err);
     res.status(401).json({ error: "Unauthorized: Invalid or missing token" });
   }
-};
-module.exports = function (req, res, next) {
-  if (!["admin", "superadmin"].includes(req.user.role)) {
-    return res.status(403).json({ error: "Access denied" });
-  }
-  next();
 };
 
 module.exports = protect;
