@@ -1,16 +1,32 @@
-/* reason.css */
-
-body {
+/* Global Styles */
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #fdfdfd; /* Your page background */
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  background-color: #fdfdfd;
   color: #2c3e50;
 }
+.main-wrapper {
+  min-height: 100vh; /* Full viewport height */
+  background-color: #fdfdfd;
+  padding: 2.5rem 1rem; /* Optional padding */
+}
 
+section {
+  background: #ffffff;
+  padding: 1.8rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
 h1, h2 {
   scroll-margin-top: 100px;
 }
 
-h1 {
+/* Headings */ 
+ h1 {
   font-size: 2.5rem;
   font-weight: 700;
   color: #166534;
@@ -25,20 +41,247 @@ h2 {
   color: #1e3a8a;
 }
 
+/* Sections */
 section {
   background: #ffffff;
   padding: 1.8rem;
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
+.ripple-title {
+  font-weight: 800;
+  text-align: center;
+  background: linear-gradient(to right, #16a34a, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+/* Table styling */
+.ripple-table {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb; /* gray-200 */
+}
+
+.ripple-table th {
+  background-color: #bbf7d0; /* green-200 */
+  color: #1f2937; /* gray-800 */
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.ripple-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+}
+
+.ripple-table tbody tr:hover {
+  background-color: #ecfdf5; /* green-50 */
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Mobile cards */
+.ripple-card {
+  background-color: #ffffff;
+  border: 1px solid #d1fae5;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.1);
+  padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ripple-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.15);
+}
+
+.ripple-card h3 {
+  font-weight: 700;
+  color: #15803d; /* green-700 */
+  margin-bottom: 0.5rem;
+}
+
+/* Grid labels in cards */
+.ripple-card .label {
+  font-weight: 600;
+  color: #374151; /* gray-700 */
+}
+
+/* Highlighted values */
+.text-green {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.text-red {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* Conclusion box */
+.ripple-conclusion {
+  margin-top: 2rem;
+  background: linear-gradient(to right, #fefce8, #fef9c3);
+  padding: 1.5rem;
+  border-left: 6px solid #facc15; /* yellow-400 */
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 10px rgba(202, 138, 4, 0.1);
+}
+
+.ripple-conclusion h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.ripple-conclusion p {
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.ripple-conclusion b {
+  font-weight: 700;
+}
+
+.ripple-conclusion .impact {
+  margin-top: 1rem;
+  color: #1e40af; /* blue-900 */
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.ripple-title {
+  font-weight: 800;
+  text-align: center;
+  background: linear-gradient(to right, #16a34a, #059669);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+/* Table styling */
+.ripple-table {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb; /* gray-200 */
+}
+
+.ripple-table th {
+  background-color: #bbf7d0; /* green-200 */
+  color: #1f2937; /* gray-800 */
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.ripple-table td {
+  border: 1px solid #e5e7eb;
+  padding: 0.5rem 1rem;
+}
+
+.ripple-table tbody tr:hover {
+  background-color: #ecfdf5; /* green-50 */
+  transition: background-color 0.2s ease-in-out;
+}
+
+/* Mobile cards */
+.ripple-card {
+  background-color: #ffffff;
+  border: 1px solid #d1fae5;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.1);
+  padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ripple-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(16, 185, 129, 0.15);
+}
+
+.ripple-card h3 {
+  font-weight: 700;
+  color: #15803d; /* green-700 */
+  margin-bottom: 0.5rem;
+}
+
+/* Grid labels in cards */
+.ripple-card .label {
+  font-weight: 600;
+  color: #374151; /* gray-700 */
+}
+
+/* Highlighted values */
+.text-green {
+  color: #15803d;
+  font-weight: 600;
+}
+
+.text-red {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* Conclusion box */
+.ripple-conclusion {
+  margin-top: 2rem;
+  background: linear-gradient(to right, #fefce8, #fef9c3);
+  padding: 1.5rem;
+  border-left: 6px solid #facc15; /* yellow-400 */
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 10px rgba(202, 138, 4, 0.1);
+}
+
+.ripple-conclusion h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.ripple-conclusion p {
+  color: #374151;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.ripple-conclusion b {
+  font-weight: 700;
+}
+
+.ripple-conclusion .impact {
+  margin-top: 1rem;
+  color: #1e40af; /* blue-900 */
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+/* Paragraphs */
+p {
+  color: #374151;
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.mt-2 { margin-top: 0.5rem; }
+.font-medium { font-weight: 500; }
+.font-bold { font-weight: 700; }
+
+/* Lists */
 ul {
   padding-left: 1.2rem;
   list-style-type: disc;
@@ -46,74 +289,67 @@ ul {
   margin-top: 0.5rem;
 }
 
-p {
-  color: #374151;
-  line-height: 1.6;
+.list-inside { list-style-position: inside; }
+.space-y-1 > * + * { margin-top: 0.25rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+
+/* Text Colors */
+.text-green-700 { color: #16a34a; }
+.text-green-800 { color: #166534; }
+.text-red-600 { color: #dc2626; }
+.text-blue-700 { color: #1d4ed8; }
+.text-indigo-600 { color: #4f46e5; }
+.text-yellow-700 { color: #ca8a04; }
+
+/* Cards and Containers */
+.max-w-4xl { max-width: 64rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+.space-y-10 > * + * { margin-top: 2.5rem; }
+
+.rounded-xl { border-radius: 1rem; }
+.shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.shadow-md { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.border { border-width: 1px; }
+.border-gray-200 { border-color: #e5e7eb; }
+.border-gray-100 { border-color: #f3f4f6; }
+.border-l-4 { border-left-width: 4px; }
+
+/* Table Styles */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: #ffffff;
 }
 
-.mt-2 {
-  margin-top: 0.5rem;
+th, td {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  text-align: left;
 }
 
-.font-medium {
-  font-weight: 500;
-}
-
-.font-bold {
-  font-weight: 700;
-}
-
-.text-green-800 {
+th {
+  background-color: #dcfce7;
   color: #166534;
+  font-weight: 600;
 }
 
-.text-indigo-600 {
-  color: #4f46e5;
+tbody tr:nth-child(even) {
+  background-color: #f9fafb;
 }
 
-.text-blue-700 {
-  color: #1d4ed8;
+tbody tr:hover {
+  background-color: #f0fdf4;
+  transform: translateY(-1px);
 }
 
-.italic {
-  font-style: italic;
-}
-
-.max-w-4xl {
-  max-width: 64rem;
-}
-
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.py-10 {
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
-}
-
-.space-y-10 > * + * {
-  margin-top: 2.5rem;
-}
-
-.list-inside {
-  list-style-position: inside;
-}
-
-.shadow-sm {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-}
-
-.rounded-xl {
-  border-radius: 1rem;
-}
-
-.border {
-  border-width: 1px;
+/* Responsive Table Cards */
+@media (max-width: 640px) {
+  th, td {
+    padding: 0.5rem 0.5rem;
+  }
+  table {
+    min-width: 100px;
+  }
 }

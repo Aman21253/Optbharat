@@ -4,10 +4,18 @@ import "./reason.css";
 import Header from "../components/header";
 
 function WhyIndianProduct() {
+  const rippleData = [
+    { round: "Initial Spend", retainedIndia: 10000, retainedForeign: 10000 },
+    { round: "Round 2", retainedIndia: 7500,  retainedForeign: 2250 },
+    { round: "Round 3", retainedIndia: 5625,  retainedForeign: 1688 },
+    { round: "Round 4", retainedIndia: 4219,  retainedForeign: 1266 },
+    { round: "Round 5", retainedIndia: 3164, retainedForeign: 950 },
+    { round: "Round 6", retainedIndia: 2373, retainedForeign: 713 },
+  ];
   return (
     <>
-    <div className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-800">
-      <h1 className="text-4xl font-bold text-center text-green-700">
+    <div className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
         🇮🇳 Why Indians Should Buy from India
       </h1>
 
@@ -18,9 +26,25 @@ function WhyIndianProduct() {
         </p>
       </section>
 
-      <h1 className="text-4xl font-bold text-center text-green-700">
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
+        💥 Multiply the Impact
+      </h1>
+      <section>
+        <h2 className="text-xl font-semibold text-indigo-600 mb-1">When you buy Indian, your money doesn’t stop at one person. It moves. It multiplies.</h2>
+        <ul className="list-disc list-inside space-y-1">
+          <li>Creates jobs across the value chain</li>
+          <li>Fuels Indian entrepreneurship</li>
+          <li>Strengthens the rupee, reduces imports</li>
+          <li>Grows tax revenue for national development</li>
+        </ul>
+        <br />
+        <h2 className="text-2xl font-semibold text-blue-700 mb-2">One purchase. A hundred ripple effects.</h2>
+        <p className="mt-2 font-medium">👉 Support Indian brands — fuel Indian dreams.</p>
+      </section>
+      
+      <h3>
           📊 Assumptions Behind the Numbers
-        </h1>
+        </h3>
         <section className="bg-gray-50 p-6 rounded-xl shadow-md border border-gray-200">
           <ul className="list-disc list-inside space-y-2 text-gray-700">
             <li>
@@ -40,108 +64,53 @@ function WhyIndianProduct() {
             </li>
           </ul>
         </section>
-      <h1 className="text-4xl font-bold text-center text-green-700">
-          💹 The Ripple Effect of Your ₹10,000
-        </h1>
-        <section className="overflow-x-auto">
+
+        <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">💹 The Ripple Effect of Your ₹10,000</h1>
+      <section>
+        {/* Desktop Table */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-sm text-left border border-gray-200 shadow-md">
             <thead className="bg-green-100 text-gray-800">
               <tr>
                 <th className="px-4 py-2 border">Spending Round</th>
-                <th className="px-4 py-2 border">Indian Brand (₹)</th>
                 <th className="px-4 py-2 border">Retained in India (₹)</th>
-                <th className="px-4 py-2 border">Foreign Brand (₹)</th>
-                <th className="px-4 py-2 border">Retained in India (₹)</th>
+                <th className="px-2 py-1 border">Spend in foregin (₹)</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="px-4 py-2 border">Initial Spend</td>
-                <td className="px-4 py-2 border">10,000</td>
-                <td className="px-4 py-2 border">10,000</td>
-                <td className="px-4 py-2 border">10,000</td>
-                <td className="px-4 py-2 border">3,000</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border">Round 2</td>
-                <td className="px-4 py-2 border">7,500</td>
-                <td className="px-4 py-2 border">7,500</td>
-                <td className="px-4 py-2 border">2,250</td>
-                <td className="px-4 py-2 border">2,250</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border">Round 3</td>
-                <td className="px-4 py-2 border">5,625</td>
-                <td className="px-4 py-2 border">5,625</td>
-                <td className="px-4 py-2 border">1,688</td>
-                <td className="px-4 py-2 border">1,688</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border">Round 4</td>
-                <td className="px-4 py-2 border">4,219</td>
-                <td className="px-4 py-2 border">4,219</td>
-                <td className="px-4 py-2 border">1,266</td>
-                <td className="px-4 py-2 border">1,266</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border">Round 5</td>
-                <td className="px-4 py-2 border">3,164</td>
-                <td className="px-4 py-2 border">3,164</td>
-                <td className="px-4 py-2 border">950</td>
-                <td className="px-4 py-2 border">950</td>
-              </tr>
-              <tr>
-                <td className="px-4 py-2 border">Round 6</td>
-                <td className="px-4 py-2 border">2,373</td>
-                <td className="px-4 py-2 border">2,373</td>
-                <td className="px-4 py-2 border">713</td>
-                <td className="px-4 py-2 border">713</td>
-              </tr>
+              {rippleData.map((row, idx) => (
+                <tr key={idx}>
+                  <td className="px-4 py-2 border">{row.round}</td>
+                  <td className="px-4 py-2 border text-green-700">{row.retainedIndia}</td>
+                  <td className="px-2 py-1 border text-red-600">{row.retainedForeign}</td>
+                </tr>
+              ))}
               <tr className="bg-gray-100 font-semibold">
                 <td className="px-4 py-2 border">Total Retained</td>
-                <td className="px-4 py-2 border">—</td>
                 <td className="px-4 py-2 border text-green-700">32,881</td>
-                <td className="px-4 py-2 border">—</td>
                 <td className="px-4 py-2 border text-red-600">9,867</td>
               </tr>
             </tbody>
           </table>
+        </div>
 
-          <div className="mt-6 bg-yellow-50 p-6 rounded-xl shadow-md border-l-4 border-yellow-500">
-            <h2 className="text-xl font-bold text-gray-800 mb-2">Conclusion</h2>
-            <p className="text-gray-700">
-              Buying from <b>Indian brands</b>: ₹10,000 creates{" "}
-              <b className="text-green-700">₹32,881</b> worth of economic
-              activity in India.
-            </p>
-            <p className="text-gray-700">
-              Buying from <b>foreign brands</b>: ₹10,000 creates only{" "}
-              <b className="text-red-600">₹9,867</b> worth of economic activity
-              in India.
-            </p>
-            <p className="mt-3 font-medium text-blue-800">
-              👉 That’s a <b>3.3x greater impact</b> when you buy Indian.
-            </p>
-          </div>
-        </section>
-
-      <h1 className="text-4xl font-bold text-center text-green-700">
-        💥 Multiply the Impact
-      </h1>
-      <section>
-        <h2 className="text-xl font-semibold text-indigo-600 mb-1">When you buy Indian, your money doesn’t stop at one person. It moves. It multiplies.</h2>
-        <ul className="list-disc list-inside space-y-1">
-          <li>Creates jobs across the value chain</li>
-          <li>Fuels Indian entrepreneurship</li>
-          <li>Strengthens the rupee, reduces imports</li>
-          <li>Grows tax revenue for national development</li>
-        </ul>
-        <br />
-        <h2 className="text-2xl font-semibold text-blue-700 mb-2">One purchase. A hundred ripple effects.</h2>
-        <p className="mt-2 font-medium">👉 Support Indian brands — fuel Indian dreams.</p>
+        {/* Conclusion Box */}
+        <div className="mt-6 bg-yellow-50 p-6 rounded-xl shadow-md border-l-4 border-yellow-500">
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Conclusion</h2>
+          <p className="text-gray-700">
+            Buying from <b>Indian brands</b>: ₹10,000 creates <b className="text-green-700">₹32,881</b> worth of economic activity in India.
+          </p>
+          <p className="text-gray-700">
+            Buying from <b>foreign brands</b>: ₹10,000 creates only <b className="text-red-600">₹9,867</b> worth of economic activity in India.
+          </p>
+          <p className="mt-3 font-medium text-blue-800">
+            👉 That’s a <b>3.3x greater impact</b> when you buy Indian.
+          </p>
+        </div>
       </section>
 
-      <h1 className="text-4xl font-bold text-center text-green-700">
+
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
         🏠 Charity Begins at Home
       </h1>
       <section>
@@ -154,7 +123,7 @@ function WhyIndianProduct() {
         <p className="mt-2 font-medium">👉 Buy from Indian makers the way you want others to buy from you.</p>
       </section>
 
-      <h1 className="text-4xl font-bold text-center text-green-700">
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
         🧠 Break the Colonial Mindset
       </h1>
       <section>
@@ -170,7 +139,7 @@ function WhyIndianProduct() {
         <p className="mt-2 font-medium">👉 Be proud of what we make. Back our brilliance.</p>
       </section>
 
-      <h1 className="text-4xl font-bold text-center text-green-700">
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
         🏏 Put Your Money Where Your Mouth Is
       </h1>
       <section>
@@ -178,7 +147,7 @@ function WhyIndianProduct() {
         <p className="mt-2 font-medium">👉 Want to help India rise? Start with your wallet.</p>
       </section>
 
-      <h1 className="text-4xl font-bold text-center text-green-700">
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
         🎯 Indian Brands = Made for Indian Needs
       </h1>
       <section>
@@ -190,7 +159,7 @@ function WhyIndianProduct() {
         <p className="mt-2 font-medium">👉 Why settle for foreign fits when desi delivers better?</p>
       </section>
 
-      <h1 className="text-4xl font-bold text-center text-green-700">
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
         🌍Cultural Confidence Begins with Economic Confidence
       </h1>
       <section>
@@ -199,7 +168,7 @@ function WhyIndianProduct() {
         <p className="mt-2 font-medium">👉 Confidence isn’t borrowed — it’s built.</p>
       </section>
 
-      <h1 className="text-4xl font-bold text-center text-green-700">
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
         💸 When Your Money Stays, It Builds
       </h1>
       <section>
@@ -213,7 +182,7 @@ function WhyIndianProduct() {
         <p className="mt-2 font-medium">👉 Spend local. Grow local. Win global.</p>
       </section>
 
-      <h1 className="text-4xl font-bold text-center text-green-700">
+      <h1 className="max-w-4xl mx-auto px-4 py-10 space-y-10 text-gray-400">
         ❗Stop Asking “What’s So Special About This Indian Brand?”
       </h1>
       <section>
